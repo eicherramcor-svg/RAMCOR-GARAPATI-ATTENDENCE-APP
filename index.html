@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RC Attendance">
+<meta name="theme-color" content="#0b0f1a">
+<meta name="description" content="Ramcor Garapati Attendance Management">
+<meta http-equiv="Permissions-Policy" content="camera=self, geolocation=self, microphone=self">
+<meta http-equiv="Feature-Policy" content="camera 'self'; geolocation 'self'">
+<title>Ramcor Garapati Attendance</title>
+<link rel="manifest" id="pwa-manifest">
+<!-- PWA Icons inline via JS -->
+<script>
+// ── INLINE MANIFEST (no external file needed) ──
+(function(){
+  var manifest = {
+    name: "Ramcor Garapati Attendance",
+    short_name: "RC Attendance",
+    description: "Employee Attendance Management",
+    start_url: ".",
+    display: "standalone",
+    orientation: "portrait",
+    background_color: "#0b0f1a",
+    theme_color: "#0b0f1a",
+    icons: [
+      { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%23f0b429'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle' font-family='Arial'%3E%F0%9F%93%8B%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
+      { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%23f0b429'/%3E%3Ctext x='256' y='340' font-size='300' text-anchor='middle' font-family='Arial'%3E%F0%9F%93%8B%3C/text%3E%3C/svg%3E", sizes: "512x512", type: "image/svg+xml" }
+    ]
+  };
+  var blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').setAttribute('href', url);
+})();
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0b0f1a;--bg2:#111827;--surface:#161d2e;--card:#1c2538;--card2:#212d42;
+  --border:#2a3550;--border2:#354060;--gold:#f0b429;--gold2:#fcd34d;
+  --blue:#3b82f6;--green:#10b981;--red:#ef4444;--orange:#f97316;
+  --purple:#8b5cf6;--text:#e8edf5;--text2:#a0aec0;--text3:#64748b;
+  --r:14px;--r2:10px;--shadow:0 4px 20px rgba(0,0,0,0.4)
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text)}
+
+/* PWA INSTALL BANNER */
+#pwa-banner{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:linear-gradient(135deg,#1a2d54,#0f1e3d);border-top:2px solid var(--gold);padding:14px 16px;z-index:9999;display:none;align-items:center;gap:12px;box-shadow:0 -4px 24px rgba(0,0,0,0.5)}
+#pwa-banner .pwa-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--gold),var(--orange));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+#pwa-banner .pwa-txt{flex:1}
+#pwa-banner .pwa-txt strong{display:block;font-size:13px;font-weight:800;color:var(--text)}
+#pwa-banner .pwa-txt span{font-size:10px;color:var(--text2)}
+#pwa-banner .pwa-install{background:linear-gradient(135deg,var(--gold),var(--orange));color:#000;border:none;border-radius:8px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}
+#pwa-banner .pwa-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px;line-height:1}
+#ios-banner{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:linear-gradient(135deg,#1a2d54,#0f1e3d);border-top:2px solid var(--gold);padding:14px 16px;z-index:9999;display:none;box-shadow:0 -4px 24px rgba(0,0,0,0.5)}
+#ios-banner .ios-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+#ios-banner .ios-txt strong{font-size:13px;font-weight:800;color:var(--text);display:block}
+#ios-banner .ios-txt span{font-size:10px;color:var(--text2)}
+#ios-banner .ios-steps{font-size:11px;color:var(--text2);line-height:1.8;background:rgba(255,255,255,0.05);border-radius:8px;padding:10px 12px;margin-top:8px}
+#ios-banner .ios-steps b{color:var(--gold)}
+#ios-banner .ios-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px;margin-left:auto;display:block;text-align:right;line-height:1}
+.shell{display:flex;flex-direction:column;min-height:100dvh;height:100dvh;max-width:480px;margin:0 auto;background:var(--bg);overflow:hidden;position:relative}
+
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#060b17,#0d1a2e,#060b17);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;z-index:1000;max-width:480px;margin:0 auto;left:50%;transform:translateX(-50%)}
+.login-logo{width:72px;height:72px;background:linear-gradient(135deg,var(--gold),var(--orange));border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:16px;box-shadow:0 8px 32px rgba(240,180,41,0.3)}
+.login-title{font-size:22px;font-weight:900;color:var(--text);text-align:center;margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--text3);text-align:center;margin-bottom:28px}
+.login-tabs{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:20px;width:100%;border:1px solid var(--border)}
+.ltab{flex:1;padding:10px;text-align:center;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;color:var(--text3)}
+.ltab.active{background:linear-gradient(135deg,var(--gold),var(--orange));color:#000}
+.login-card{background:var(--card);border-radius:var(--r);padding:20px;width:100%;border:1px solid var(--border)}
+.login-hint{font-size:10px;color:var(--text3);text-align:center;margin-top:12px;line-height:1.6}
+.login-err{font-size:11px;font-weight:700;color:var(--red);text-align:center;margin-top:8px;min-height:16px}
+
+/* HEADER */
+.hdr{background:var(--bg2);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--border);gap:8px}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--orange));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;font-weight:900}
+.hdr-text h1{color:var(--text);font-size:13px;font-weight:800;line-height:1.2;letter-spacing:0.2px}
+.hdr-text p{color:var(--text3);font-size:9px;margin-top:1px;font-weight:500}
+.hdr-clock strong{display:block;color:var(--gold);font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;text-align:right}
+.hdr-clock span{color:var(--text3);font-size:9px;display:block;text-align:right}
+.hdr-role{background:rgba(240,180,41,0.15);border:1px solid rgba(240,180,41,0.3);border-radius:20px;padding:3px 9px;font-size:9px;font-weight:800;color:var(--gold);letter-spacing:0.5px}
+.hdr-role.emp-role{background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.3);color:#93c5fd}
+
+/* SCREENS */
+.screens{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;min-height:0}
+.screen{display:none;padding:14px;animation:fadeUp 0.22s ease}
+.screen.active{display:block!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* BOTTOM NAV */
+.bnav{display:flex;background:var(--bg2);flex-shrink:0;border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 4px 7px;cursor:pointer;gap:3px;border:none;background:none;color:var(--text3);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;transition:color 0.2s;position:relative}
+.nb.active{color:var(--gold)}
+.nb.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--gold);border-radius:0 0 3px 3px}
+.nb svg{width:19px;height:19px;stroke-width:2}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--r);padding:15px;margin-bottom:12px;border:1px solid var(--border)}
+.card-hd{font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:13px;display:flex;align-items:center;gap:6px}
+.card-hd .badge{background:var(--gold);color:#000;font-size:8px;padding:2px 6px;border-radius:10px;font-weight:900}
+
+/* HERO BANNER */
+.hero{background:linear-gradient(135deg,#0f1e3d,#1a2d54,#0d1a30);border-radius:var(--r);padding:18px;margin-bottom:12px;border:1px solid var(--border2);position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(240,180,41,0.12),transparent 70%)}
+.hero h2{font-size:21px;font-weight:900;color:var(--text);margin-bottom:4px;line-height:1.2}
+.hero p{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:12px}
+.hero-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(240,180,41,0.12);border:1px solid rgba(240,180,41,0.3);border-radius:20px;padding:5px 12px;font-size:10px;font-weight:700;color:var(--gold)}
+
+/* STATS */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 10px;text-align:center}
+.stat-box strong{display:block;font-size:24px;font-weight:900;color:var(--text);line-height:1}
+.stat-box span{font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-top:3px;display:block}
+.stat-box.s-in strong{color:var(--green)}
+.stat-box.s-out strong{color:var(--red)}
+
+/* FORMS */
+.fg{margin-bottom:10px}
+.fg label{display:block;font-size:9px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.fg input,.fg select{width:100%;padding:11px 13px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;font-family:'Outfit',sans-serif;font-weight:600;color:var(--text);background:var(--card2);transition:border-color 0.2s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus{outline:none;border-color:var(--gold)}
+.fg input::placeholder{color:var(--text3)}
+.fg select option{background:var(--card2);color:var(--text)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* BUTTONS */
+.btn{width:100%;padding:13px;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:transform 0.1s,filter 0.15s;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{transform:scale(0.97)}
+.btn:disabled{opacity:0.3;pointer-events:none;cursor:not-allowed}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--orange));color:#000}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-dark{background:var(--card2);color:var(--text);border:1.5px solid var(--border2)}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-sm{padding:9px 13px;font-size:12px;width:auto;border-radius:8px}
+.btn-row{display:flex;gap:8px;margin-top:10px}
+.btn-row .btn{flex:1}
+
+/* CAMERA */
+.cam-wrap{position:relative;width:100%;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:4/3;border:1px solid var(--border2)}
+.cam-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.cam-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.cam-corners span{position:absolute;width:22px;height:22px;border-style:solid;border-color:var(--gold);border-width:0}
+.cam-corners span:nth-child(1){top:8px;left:8px;border-top-width:3px;border-left-width:3px;border-radius:3px 0 0 0}
+.cam-corners span:nth-child(2){top:8px;right:8px;border-top-width:3px;border-right-width:3px;border-radius:0 3px 0 0}
+.cam-corners span:nth-child(3){bottom:8px;left:8px;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 3px}
+.cam-corners span:nth-child(4){bottom:8px;right:8px;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 3px 0}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scan 2.5s ease-in-out infinite;pointer-events:none}
+@keyframes scan{0%,100%{top:10%}50%{top:88%}}
+.cam-foot{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:18px 12px 10px;text-align:center;font-size:11px;font-weight:700;color:#fff;letter-spacing:0.3px;pointer-events:none}
+
+/* FACE CHIP */
+.face-chip{display:flex;align-items:center;gap:9px;padding:10px 13px;border-radius:10px;margin-top:10px;font-size:12px;font-weight:700;border:1.5px solid;transition:all 0.3s}
+.fc-idle{background:rgba(100,116,139,0.08);border-color:var(--border2);color:var(--text3)}
+.fc-found{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.4);color:#6ee7b7}
+.fc-known{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.4);color:#93c5fd}
+.fc-unknown{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.4);color:#fca5a5}
+.fc-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.fc-found .fc-dot,.fc-known .fc-dot{animation:blink 1.2s ease infinite}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.7)}}
+
+/* SUCCESS */
+.suc-card{background:linear-gradient(135deg,#064e3b,#065f46);border-radius:var(--r);padding:20px;color:#fff;text-align:center;margin-bottom:10px;border:1px solid rgba(16,185,129,0.3)}
+.suc-card .tick{font-size:42px;margin-bottom:8px;line-height:1}
+.suc-card h3{font-size:18px;font-weight:900;margin-bottom:4px}
+.suc-card p{font-size:12px;opacity:0.7;margin-bottom:12px}
+.suc-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.suc-item{background:rgba(255,255,255,0.1);border-radius:9px;padding:9px}
+.suc-item span{display:block;font-size:8px;opacity:0.6;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:2px}
+.suc-item strong{font-size:12px;font-weight:800;word-break:break-word}
+
+/* LOG */
+.log-item{display:flex;align-items:center;gap:10px;padding:11px 12px;background:var(--card);border-radius:11px;margin-bottom:7px;border:1px solid var(--border)}
+.log-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0}
+.av-in{background:rgba(16,185,129,0.15);color:var(--green)}
+.av-out{background:rgba(239,68,68,0.12);color:var(--red)}
+.log-body{flex:1;min-width:0}
+.log-body strong{display:block;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-body span{font-size:10px;color:var(--text3)}
+.log-badge{padding:4px 9px;border-radius:20px;font-size:10px;font-weight:800;flex-shrink:0}
+.lb-in{background:rgba(16,185,129,0.15);color:var(--green)}
+.lb-out{background:rgba(239,68,68,0.12);color:var(--red)}
+
+/* EMP CHIP */
+.emp-chip{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--card2);border-radius:10px;margin-bottom:7px;border:1px solid var(--border)}
+.ec-info strong{display:block;font-size:13px;font-weight:700;color:var(--text)}
+.ec-info span{font-size:10px;color:var(--text3)}
+.ec-actions{display:flex;gap:6px}
+.ec-del{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3);border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
+
+/* ALERTS */
+.alert{padding:10px 13px;border-radius:9px;font-size:11px;font-weight:600;margin-bottom:11px;line-height:1.6;border:1px solid}
+.a-info{background:rgba(59,130,246,0.08);border-color:rgba(59,130,246,0.25);color:#93c5fd}
+.a-warn{background:rgba(249,115,22,0.08);border-color:rgba(249,115,22,0.25);color:#fdba74}
+.a-ok{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.25);color:#6ee7b7}
+.a-err{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.25);color:#fca5a5}
+
+/* LOADER */
+.ldr-bar{height:3px;background:var(--border2);border-radius:3px;overflow:hidden;margin:8px 0}
+.ldr-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:3px;animation:ldr 1.8s ease-in-out infinite}
+@keyframes ldr{0%{width:5%}60%{width:80%}100%{width:100%}}
+.ldr-txt{font-size:11px;color:var(--text3);font-weight:600;text-align:center}
+
+/* SETUP STEPS */
+.step{display:flex;gap:12px;padding:13px;background:var(--card2);border-radius:11px;margin-bottom:8px;align-items:flex-start;border:1px solid var(--border)}
+.step-n{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--orange));color:#000;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px}
+.step-body h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.step-body p{font-size:11px;color:var(--text2);line-height:1.6}
+pre.code{background:#0a0f1e;color:#7dd3fc;padding:12px;border-radius:9px;font-size:9.5px;line-height:1.9;overflow-x:auto;margin-top:8px;font-family:'JetBrains Mono',monospace;white-space:pre-wrap;word-break:break-all;border:1px solid var(--border)}
+.divider{height:1px;background:var(--border);margin:12px 0}
+.hidden{display:none!important}
+.mt10{margin-top:10px}
+.mt12{margin-top:12px}
+.txt-small{font-size:11px;color:var(--text3);line-height:1.6}
+.bold{font-weight:700;color:var(--text)}
+
+/* MY ATTENDANCE (employee view) */
+.my-att-header{background:linear-gradient(135deg,#0c1f3f,#1a2d54);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid var(--border2)}
+.my-att-header h3{font-size:16px;font-weight:800;color:var(--text);margin-bottom:2px}
+.my-att-header p{font-size:11px;color:var(--text3)}
+
+/* SECTION TABS */
+.sec-tabs{display:flex;gap:6px;margin-bottom:12px}
+.sec-tab{padding:7px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--border2);background:var(--card2);color:var(--text3);transition:all 0.2s}
+.sec-tab.active{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* MANDAL SELECT */
+.mandal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;max-height:160px;overflow-y:auto;border:1.5px solid var(--border2);border-radius:9px;padding:8px;background:var(--card2)}
+.mandal-item{padding:6px 8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;color:var(--text2);background:transparent}
+.mandal-item.sel{background:rgba(240,180,41,0.15);color:var(--gold);font-weight:800}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- LOGIN SCREEN -->
+  <div class="login-screen" id="login-screen">
+    <div class="login-logo">🏛️</div>
+    <div class="login-title">Ramcor Garapati</div>
+    <div class="login-sub">Attendance Management System · Andhra Pradesh</div>
+
+    <div class="login-tabs">
+      <div class="ltab active" id="ltab-hr" onclick="switchLoginTab('hr')">🔐 HR / Admin</div>
+      <div class="ltab" id="ltab-emp" onclick="switchLoginTab('emp')">👤 Employee</div>
+    </div>
+
+    <!-- HR LOGIN -->
+    <div class="login-card" id="hr-login-form">
+      <div class="fg">
+        <label>HR User ID</label>
+        <input type="text" id="hr-userid" placeholder="e.g. HR001" autocomplete="username">
+      </div>
+      <div class="fg">
+        <label>Password</label>
+        <input type="password" id="hr-password" placeholder="Enter password" autocomplete="current-password">
+      </div>
+      <button class="btn btn-gold mt10" onclick="doHRLogin()">🔐 Login as HR / Admin</button>
+      <div class="login-err" id="hr-login-err"></div>
+      <div class="login-hint">Default → ID: <strong>HR001</strong> &nbsp;|&nbsp; Password: <strong>ramcor@hr2024</strong><br>Change password from Admin panel after login.</div>
+    </div>
+
+    <!-- EMPLOYEE LOGIN -->
+    <div class="login-card hidden" id="emp-login-form">
+      <div class="fg">
+        <label>Employee ID</label>
+        <input type="text" id="emp-login-id" placeholder="e.g. 3041" autocomplete="username">
+      </div>
+      <button class="btn btn-blue mt10" onclick="doEmpLogin()">👤 View My Attendance</button>
+      <div class="login-err" id="emp-login-err"></div>
+      <div class="login-hint">Enter your Employee ID to view your own attendance records.<br>Contact HR to get registered.</div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="hdr" id="main-hdr" style="display:none">
+    <div class="hdr-brand">
+      <div class="logo">🏛️</div>
+      <div class="hdr-text">
+        <h1>Ramcor Garapati</h1>
+        <p>Attendance Management System</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="hdr-role" id="hdr-role-badge">HR</div>
+      <div class="hdr-clock">
+        <strong id="hdr-clock">--:--</strong>
+        <span id="hdr-date">—</span>
+      </div>
+      <button onclick="doLogout()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--red);border-radius:7px;padding:5px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">Exit</button>
+    </div>
+  </div>
+
+  <!-- SCREENS -->
+  <div class="screens" id="main-screens" style="display:none">
+
+    <!-- HOME (HR) -->
+    <div id="scr-home" class="screen active">
+      <div class="hero">
+        <h2 id="home-greet">Welcome! 👋</h2>
+        <p>Face-verified attendance for Ramcor, Garapati Autoventures &amp; Garapati Petrol across all branches and districts of Andhra Pradesh.</p>
+        <div class="hero-pill">📅 <span id="home-date">Loading…</span></div>
+      </div>
+
+      <div id="home-loader" class="card">
+        <div class="card-hd">⚙️ Loading Face Recognition AI</div>
+        <div class="ldr-bar"><div class="ldr-fill"></div></div>
+        <div class="ldr-txt" id="loader-msg">Initialising models — please wait…</div>
+      </div>
+      <div id="home-ready" class="alert a-ok hidden">✅ Face Recognition AI ready! Tap <strong>Attend</strong> to mark attendance.</div>
+
+      <div class="card" id="hr-quick-actions">
+        <div class="card-hd">⚡ Quick Actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-gold" onclick="goTo('attendance')">📷 Mark Attendance</button>
+          <button class="btn btn-dark" onclick="goTo('register')">➕ Register New Employee</button>
+          <button class="btn btn-dark" onclick="goTo('log')">📋 Full Attendance Log</button>
+          <button class="btn btn-purple" onclick="goTo('admin')">🔧 Admin Panel</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">📊 Today's Summary</div>
+        <div class="stat-row">
+          <div class="stat-box"><strong id="qs-total">0</strong><span>Total</span></div>
+          <div class="stat-box s-in"><strong id="qs-in">0</strong><span>IN</span></div>
+          <div class="stat-box s-out"><strong id="qs-out">0</strong><span>OUT</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">🏢 Organisation Structure</div>
+        <p class="txt-small" style="margin-bottom:8px">All companies &amp; branches managed in this system:</p>
+        <div id="org-structure-list" class="txt-small"></div>
+      </div>
+    </div>
+
+    <!-- MY ATTENDANCE (Employee View) -->
+    <div id="scr-myatt" class="screen">
+      <div class="my-att-header">
+        <h3 id="myatt-name">My Attendance</h3>
+        <p id="myatt-details">Employee details</p>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><strong id="myatt-total">0</strong><span>Total</span></div>
+        <div class="stat-box s-in"><strong id="myatt-in">0</strong><span>IN</span></div>
+        <div class="stat-box s-out"><strong id="myatt-out">0</strong><span>OUT</span></div>
+      </div>
+      <div id="myatt-list"><p class="ldr-txt" style="padding:30px">No attendance records found.</p></div>
+    </div>
+
+    <!-- MARK ATTENDANCE -->
+    <div id="scr-attendance" class="screen">
+      <div id="att-loading" class="alert a-warn hidden">⏳ AI models still loading… please wait a moment before scanning.</div>
+
+      <div class="card">
+        <div class="card-hd">📷 Face Scanner
+          <span class="badge" id="face-count-badge">0 Registered</span>
+        </div>
+        <div class="cam-wrap" id="att-cam-wrap">
+          <video id="att-video" autoplay muted playsinline></video>
+          <canvas id="att-canvas"></canvas>
+          <div class="cam-corners"><span></span><span></span><span></span><span></span></div>
+          <div class="scan-line" id="att-scan-line"></div>
+          <div class="cam-foot" id="cam-foot">Tap Start Camera below</div>
+        </div>
+        <div class="face-chip fc-idle" id="face-chip">
+          <div class="fc-dot"></div>
+          <span id="face-chip-txt">No face detected — look at the camera</span>
+        </div>
+        <button class="btn btn-dark mt10" onclick="startAttCam()" id="btn-start-cam">▶ Start Camera</button>
+      </div>
+
+      <div class="card" id="att-recognized-card" style="display:none">
+        <div class="card-hd">👤 Recognized Employee</div>
+        <div style="display:flex;align-items:center;gap:12px;padding:8px;background:rgba(59,130,246,0.08);border-radius:10px;border:1px solid rgba(59,130,246,0.2)">
+          <div style="width:44px;height:44px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">👤</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:var(--text)" id="rec-name">—</div>
+            <div style="font-size:11px;color:var(--text3)" id="rec-details">—</div>
+          </div>
+        </div>
+        <div class="row2" style="margin-top:12px">
+          <div class="fg" style="margin-bottom:0"><label>🟢 Log In As</label>
+            <select id="rec-in-type">
+              <option value="Office">Office</option>
+              <option value="On Duty">On Duty</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-bottom:0"><label>🔴 Log Out Reason</label>
+            <select id="rec-out-type">
+              <option value="Office Closing Time">Office Closing Time</option>
+              <option value="Permission">Permission</option>
+              <option value="Lunch">Lunch</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:10px">
+          <button class="btn btn-green" id="btn-in-recognized" onclick="markAttRecognized('IN')" disabled>✅ CHECK IN</button>
+          <button class="btn btn-red" id="btn-out-recognized" onclick="markAttRecognized('OUT')" disabled>🚪 CHECK OUT</button>
+        </div>
+      </div>
+
+      <div class="card" id="att-manual-card">
+        <div class="card-hd">📝 Employee Details <span style="color:var(--text3);font-size:9px;font-weight:700" id="att-manual-label">(Manual Entry)</span></div>
+        <div class="alert a-info" id="att-manual-warn">📝 Fill in employee details below and tap IN / OUT. Camera face recognition will auto-fill details when available.</div>
+        <div class="fg">
+          <label>Organisation *</label>
+          <select id="att-org" onchange="updateBrand('att')">
+            <option value="">— Select Organisation —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Brand / Division *</label>
+          <select id="att-brand" onchange="updateBranch('att')">
+            <option value="">— Select Brand —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>District *</label>
+          <select id="att-district" onchange="updateMandal('att')">
+            <option value="">— Select District —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Mandal / Town *</label>
+          <select id="att-mandal">
+            <option value="">— Select Mandal —</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="fg"><label>Employee ID *</label><input type="text" id="att-empid" placeholder="EMP001"></div>
+          <div class="fg"><label>Full Name *</label><input type="text" id="att-name" placeholder="Full name"></div>
+        </div>
+        <div class="row2">
+          <div class="fg"><label>Designation</label><input type="text" id="att-desig" placeholder="e.g. Mechanic"></div>
+          <div class="fg"><label>Mobile</label><input type="tel" id="att-mobile" placeholder="10-digit"></div>
+        </div>
+        <div class="fg"><label>📍 GPS Location</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="text" id="att-gps" placeholder="Tap GPS or enter Lat,Lng" style="flex:1">
+            <button type="button" onclick="getAttGPS(this)" style="padding:8px 10px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:Outfit,sans-serif">📍 GPS</button>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="fg" style="margin-bottom:0"><label>🟢 Log In As</label>
+            <select id="att-in-type">
+              <option value="Office">Office</option>
+              <option value="On Duty">On Duty</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-bottom:0"><label>🔴 Log Out Reason</label>
+            <select id="att-out-type">
+              <option value="Office Closing Time">Office Closing Time</option>
+              <option value="Permission">Permission</option>
+              <option value="Lunch">Lunch</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-green" id="btn-in-manual" onclick="markAttManual('IN')">✅ IN</button>
+          <button class="btn btn-red" id="btn-out-manual" onclick="markAttManual('OUT')">🚪 OUT</button>
+        </div>
+      </div>
+
+      <div id="att-result" class="hidden">
+        <div class="suc-card">
+          <div class="tick" id="suc-icon">✅</div>
+          <h3 id="suc-title">Checked IN</h3>
+          <p id="suc-sub">—</p>
+          <div class="suc-grid">
+            <div class="suc-item"><span>Employee ID</span><strong id="suc-id">—</strong></div>
+            <div class="suc-item"><span>Organisation</span><strong id="suc-org">—</strong></div>
+            <div class="suc-item"><span>Brand</span><strong id="suc-brand">—</strong></div>
+            <div class="suc-item"><span>District</span><strong id="suc-district">—</strong></div>
+            <div class="suc-item"><span>Time</span><strong id="suc-time">—</strong></div>
+            <div class="suc-item"><span>Date</span><strong id="suc-date">—</strong></div>
+          </div>
+          <div id="suc-gps-row" style="margin-top:8px;padding:8px 10px;background:rgba(16,185,129,0.08);border-radius:8px;border:1px solid rgba(16,185,129,0.2);font-size:10px;color:#6ee7b7;display:none">📍 GPS: <strong id="suc-gps">—</strong></div>
+        </div>
+        <button class="btn btn-dark" onclick="resetAttResult()">Mark Another</button>
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="scr-register" class="screen">
+      <div class="alert a-info">ℹ️ Register each employee's face once. During attendance the system will automatically recognize and fill their details.</div>
+
+      <div class="card">
+        <div class="card-hd">📷 Capture Face Photo</div>
+        <div class="cam-wrap">
+          <video id="reg-video" autoplay muted playsinline></video>
+          <canvas id="reg-canvas-overlay"></canvas>
+          <div class="cam-corners"><span></span><span></span><span></span><span></span></div>
+          <div class="cam-foot" id="reg-cam-foot">Tap Camera below to start</div>
+        </div>
+        <canvas id="reg-snap" class="hidden" style="width:100%;border-radius:10px;margin-top:10px;border:1px solid var(--border)"></canvas>
+        <p class="ldr-txt mt10" id="reg-status">Position face clearly in frame with good lighting</p>
+        <div class="btn-row mt10">
+          <button class="btn btn-dark btn-sm" onclick="startRegCam()">▶ Camera</button>
+          <button class="btn btn-gold btn-sm" id="btn-cap" onclick="captureReg()" disabled>📸 Capture</button>
+          <button class="btn btn-green btn-sm" id="btn-save" onclick="saveReg()" disabled>💾 Save</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">📝 Employee Information</div>
+        <div class="row2">
+          <div class="fg"><label>Employee ID *</label><input type="text" id="reg-empid" placeholder="e.g. 3041"></div>
+          <div class="fg"><label>Full Name *</label><input type="text" id="reg-name" placeholder="Full name"></div>
+        </div>
+        <div class="fg">
+          <label>Organisation *</label>
+          <select id="reg-org" onchange="updateBrand('reg')">
+            <option value="">— Select Organisation —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Brand / Division *</label>
+          <select id="reg-brand" onchange="updateBranch('reg')">
+            <option value="">— Select Brand —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>District *</label>
+          <select id="reg-district" onchange="updateMandal('reg')">
+            <option value="">— Select District —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Mandal / Town *</label>
+          <select id="reg-mandal">
+            <option value="">— Select Mandal —</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="fg"><label>Designation *</label><input type="text" id="reg-desig" placeholder="e.g. Mechanic"></div>
+          <div class="fg"><label>Mobile</label><input type="tel" id="reg-mobile" placeholder="10-digit"></div>
+        </div>
+        <div class="fg"><label>Email</label><input type="email" id="reg-email" placeholder="email@example.com"></div>
+        <div class="fg"><label>📍 GPS Location (optional)</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="text" id="reg-gps" placeholder="Tap GPS to auto-fill" readonly style="flex:1">
+            <button type="button" onclick="getRegGPS(this)" style="padding:8px 10px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:Outfit,sans-serif">📍 GPS</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">👥 Registered Employees <span class="badge" id="reg-count">0</span></div>
+        <div style="display:flex;gap:7px;margin-bottom:10px">
+          <input type="text" id="reg-search" placeholder="Search by name, ID…" style="flex:1;padding:8px 11px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;color:var(--text);background:var(--card2)" oninput="loadRegList()">
+        </div>
+        <div id="reg-list"><p class="ldr-txt" style="padding:16px">No employees registered yet</p></div>
+      </div>
+    </div>
+
+    <!-- LOG (HR full view) -->
+    <div id="scr-log" class="screen">
+      <div class="card" id="live-track-card">
+        <div class="card-hd">📡 Live Locations <span class="badge" id="live-count">0</span></div>
+        <div class="alert a-info" style="margin-bottom:10px">Real-time location of employees currently checked <strong>IN</strong> (On Duty). Updates automatically while the app stays open on their device — location stops updating once they check OUT or close the app.</div>
+        <div id="live-list"><p class="ldr-txt">No one is currently checked in.</p></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><strong id="ls-total">0</strong><span>Total</span></div>
+        <div class="stat-box s-in"><strong id="ls-in">0</strong><span>IN</span></div>
+        <div class="stat-box s-out"><strong id="ls-out">0</strong><span>OUT</span></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <button class="btn btn-blue btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-dark btn-sm" onclick="clearLog()">🗑 Clear All</button>
+      </div>
+      <div style="display:flex;gap:7px;margin-bottom:8px;flex-wrap:wrap">
+        <select id="log-filter-org" style="flex:1;min-width:120px;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:11px;font-family:'Outfit',sans-serif;color:var(--text);background:var(--card2)" onchange="renderLog()">
+          <option value="">All Orgs</option>
+        </select>
+        <select id="log-filter-status" style="flex:1;min-width:100px;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:11px;font-family:'Outfit',sans-serif;color:var(--text);background:var(--card2)" onchange="renderLog()">
+          <option value="">All Status</option>
+          <option value="IN">IN Only</option>
+          <option value="OUT">OUT Only</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:7px;margin-bottom:10px">
+        <input type="text" id="log-search" placeholder="Search employee name or ID…" style="flex:1;padding:8px 11px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;color:var(--text);background:var(--card2)" oninput="renderLog()">
+      </div>
+      <div id="log-list"><p class="ldr-txt" style="padding:30px">No records yet</p></div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="scr-admin" class="screen">
+      <div class="hero" style="background:linear-gradient(135deg,#1a0533,#2d0f4f,#1a0533)">
+        <h2>🔧 Admin Panel</h2>
+        <p>Manage employees, passwords, locations and system settings.</p>
+      </div>
+
+      <div class="sec-tabs">
+        <div class="sec-tab active" onclick="adminTab('employees')">👥 Employees</div>
+        <div class="sec-tab" onclick="adminTab('passwords')">🔑 Passwords</div>
+        <div class="sec-tab" onclick="adminTab('backup')">💾 Backup</div>
+      </div>
+
+      <!-- EMPLOYEES TAB -->
+      <div id="admin-tab-employees">
+        <div class="card">
+          <div class="card-hd">👥 All Registered Employees <span class="badge" id="admin-emp-count">0</span></div>
+          <div style="display:flex;gap:7px;margin-bottom:10px">
+            <input type="text" id="admin-emp-search" placeholder="Search name or ID…" style="flex:1;padding:8px 11px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;color:var(--text);background:var(--card2)" oninput="renderAdminEmpList()">
+          </div>
+          <div id="admin-emp-list"><p class="ldr-txt">No employees</p></div>
+        </div>
+      </div>
+
+      <!-- PASSWORDS TAB -->
+      <div id="admin-tab-passwords" class="hidden">
+        <div class="card">
+          <div class="card-hd">🔑 Change HR Password</div>
+          <div class="fg"><label>HR User ID</label><input type="text" id="pw-userid" value="HR001" readonly></div>
+          <div class="fg"><label>Current Password</label><input type="password" id="pw-current" placeholder="Current password"></div>
+          <div class="fg"><label>New Password</label><input type="password" id="pw-new" placeholder="New password (min 6 chars)"></div>
+          <div class="fg"><label>Confirm New Password</label><input type="password" id="pw-confirm" placeholder="Repeat new password"></div>
+          <button class="btn btn-gold mt10" onclick="changePassword()">🔑 Update Password</button>
+          <div id="pw-msg" style="font-size:11px;font-weight:700;margin-top:8px;min-height:16px"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">ℹ️ Employee Access Info</div>
+          <div class="alert a-info">Employees login with their <strong>Employee ID</strong>. No separate password needed — they can only view their own records. To change an employee ID, update their registration.</div>
+        </div>
+      </div>
+
+      <!-- BACKUP TAB -->
+      <div id="admin-tab-backup" class="hidden">
+        <div class="card">
+          <div class="card-hd">💾 Data Backup &amp; Restore</div>
+          <div class="alert a-warn" style="margin-bottom:10px">All data is stored in this browser. Export backups regularly. Do not clear browser storage.</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-dark" onclick="exportRegistrations()">⬇ Export Employee Registrations (.json)</button>
+            <button class="btn btn-dark" onclick="importRegistrations()">⬆ Import Employee Registrations</button>
+            <button class="btn btn-blue" onclick="exportCSV()">⬇ Export Attendance Log (.csv)</button>
+          </div>
+          <input type="file" id="import-file" accept=".json" class="hidden" onchange="handleImport(event)">
+        </div>
+
+        <div class="card">
+          <div class="card-hd">🔗 Google Sheets Integration</div>
+          <div class="alert a-info" style="margin-bottom:10px">Sync attendance to Google Sheets in real-time. Follow the 3 steps below.</div>
+
+          <div class="step">
+            <div class="step-n">1</div>
+            <div class="step-body">
+              <h4>Create Google Sheet</h4>
+              <p>Go to <strong>sheets.google.com</strong> → New Sheet → Name it <em>AP Attendance</em><br>Row 1 headers (in this exact order): Timestamp, Organisation, Brand, District, Mandal, Employee ID, Name, Designation, Mobile number, Log in/out, Status, Date, Time, Face Verified, GPS, Map Link</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-n">2</div>
+            <div class="step-body">
+              <h4>Paste Apps Script Code</h4>
+              <p>In the sheet: <strong>Extensions → Apps Script</strong><br>Delete existing code, paste the code below, press <strong>Ctrl+S</strong></p>
+              <pre class="code" id="apps-script-code">function doPost(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getActiveSheet();
+    var d = JSON.parse(e.postData.contents);
+    var gps = d.gps || '';
+    var mapLink = gps ? ('https://maps.google.com/?q=' + gps) : '';
+    sheet.appendRow([
+      new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'}), // Timestamp
+      d.organisation || '',           // Organisation
+      d.brand || '',                  // Brand
+      d.district || '',               // District
+      d.mandal || '',                 // Mandal
+      d.empid || '',                  // Employee ID
+      d.name || '',                   // Name
+      d.designation || '',            // Designation
+      d.mobile || '',                 // Mobile number
+      d.status || '',                 // Log in/out  → IN or OUT
+      d.subStatus || '',              // Status      → On Duty / Office / Lunch / Permission / Office Closing Time
+      d.date || '',                   // Date
+      d.time || '',                   // Time
+      d.faceVerified ? 'YES' : 'NO',  // Face Verified
+      gps,                            // GPS
+      mapLink                         // Map Link
+    ]);
+    return ContentService.createTextOutput(
+      JSON.stringify({result:'success'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(
+      JSON.stringify({result:'error',message:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+function doGet(e) {
+  return ContentService.createTextOutput('AP Attendance OK')
+    .setMimeType(ContentService.MimeType.TEXT);
+}</pre>
+              <button class="btn btn-dark btn-sm mt10" onclick="copyScript()">📋 Copy Code</button>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-n">3</div>
+            <div class="step-body">
+              <h4>Deploy &amp; Connect</h4>
+              <p>Already deployed before? You don't need a new URL — just go to <strong>Deploy → Manage deployments → ✏️ Edit (pencil) → Version: New version → Deploy</strong> so the updated code goes live on the same link.<br>First time? <strong>Deploy → New Deployment</strong> → Type: Web App | Execute as: Me | Access: Anyone → Deploy → Authorize → Copy the URL → paste below.</p>
+            </div>
+          </div>
+
+          <div class="alert a-info" style="margin-top:10px">✅ A Google Sheet Web App URL is already deployed by default. Attendance (including Login type and Logout reason) is syncing automatically. Paste a different URL below only if you want to connect your own sheet instead.</div>
+          <div class="fg" style="margin-top:12px">
+            <label>Apps Script Web App URL</label>
+            <input type="url" id="sheet-url" placeholder="https://script.google.com/macros/s/…">
+          </div>
+          <div id="url-msg" style="font-size:11px;font-weight:600;margin-bottom:10px;min-height:16px"></div>
+          <button class="btn btn-green" onclick="saveSheetUrl()">🔗 Connect Google Sheet</button>
+        </div>
+      </div>
+    </div>
+
+
+  </div><!-- /screens -->
+
+  <!-- BOTTOM NAV (HR) -->
+  <div class="bnav" id="hr-bnav" style="display:none">
+    <button class="nb active" onclick="goTo('home')" id="nav-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+    </button>
+    <button class="nb" onclick="goTo('attendance')" id="nav-attendance">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Attend
+    </button>
+    <button class="nb" onclick="goTo('register')" id="nav-register">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Register
+    </button>
+    <button class="nb" onclick="goTo('log')" id="nav-log">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Log
+    </button>
+    <button class="nb" onclick="goTo('admin')" id="nav-admin">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>Admin
+    </button>
+  </div>
+
+  <!-- BOTTOM NAV (Employee) -->
+  <div class="bnav" id="emp-bnav" style="display:none">
+    <button class="nb active" onclick="goToEmp('myatt')" id="nav-myatt">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>My Records
+    </button>
+    <button class="nb" onclick="goToEmp('attendance')" id="nav-myattend">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Mark Attend
+    </button>
+  </div>
+
+</div><!-- /shell -->
+
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/dist/face-api.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// AP DISTRICTS + MANDALS (All 26 Districts of Andhra Pradesh)
+// ═══════════════════════════════════════════════════════════════════
+var AP_DISTRICTS = {
+  "Srikakulam": ["Srikakulam","Amadalavalasa","Narasannapeta","Palakonda","Rajam","Tekkali","Etcherla","Kanchili","Kaviti","Kotabommali","Mandasa","Meliaputti","Pathapatnam","Polaki","Saravakota","Sompeta","Vajrapukotturu","Vangara","Itchapuram","Gara","Hiramandalam","Jalumuru","Kili","Laveru","Nandigama","Ranasthalam","Sarubujjili"],
+  "Vizianagaram": ["Vizianagaram","Bobbili","Parvathipuram","Saluru","Gajapathinagaram","Bheemunipatnam","Cheepurupalli","Dattirajeru","Garividi","Gurla","Jami","Komarada","Kurupam","Lakkavarapukota","Merakamudidam","Makkuva","Nellimarla","Pachipenta","Palakonda","Ramabhadrapuram","Regidi Amadalavalasa","Srungavarapukota","Vepada","Vizianagaram Rural"],
+  "Visakhapatnam": ["Visakhapatnam","Bheemunipatnam","Chodavaram","Gajuwaka","Gajularega","Kasimkota","Koyyuru","Madugula","Munagapaka","Nakkapalle","Narsipatnam","Padmanabham","Payakaraopeta","Rambilli","Rolugunta","S Rayavaram","Sabbavaram","Seetampeta","Yellamanchili","Anakapalle","Pendurthi"],
+  "Alluri Sitharama Raju": ["Paderu","Araku Valley","Chintapalle","Dumbriguda","Gudem Kotha Veedhi","G Madugula","Hukumpeta","K Kotapadu","Koyyuru","Munchingput","Nathavaram","Pedabayalu","Ravikamatham","Rolugunta","Sunkarametta","Ananthagiri"],
+  "Anakapalli": ["Anakapalli","Chodavaram","Elamanchili","Golugonda","Kasimkota","Madugula","Makavarapalem","Nakkapalle","Narsipatnam","Nathavaram","Paravada","Payakaraopeta","Ravikamatham","Rolugunta","S Rayavaram","Sabbavaram","Yelamanchili"],
+  "Kakinada": ["Kakinada","Peddapuram","Samalkota","Tuni","Amalapuram","Gollaprolu","Jaggampeta","Kothapeta","Malkipuram","Mamidikuduru","Pithapuram","Prathipadu","Razole","Rayavaram","Rowthulapudi","U Kothapalli"],
+  "East Godavari": ["Rajamahendravaram","Kovvur","Rajahmundry Rural","Amalapuram","Ambajipeta","Alamuru","Allavaram","Biccavolu","Draksharamam","Gangavaram","Gokavaram","I Polavaram","Kajuluru","Kapileswara Puram","Kothapeta","Malikipuram","Mandapeta","Maredumilli","Morusumilli","P Gannavaram","Rampachodavaram","Rangampeta","Rajanagaram","Sakhinetipalli","Siddantam","Tallarevu","Tuni","Yeleswaram"],
+  "West Godavari": ["Eluru","Bhimavaram","Tadepalligudem","Jangareddigudem","Kovvur","Akiveedu","Buttayagudem","Chintalapudi","Denduluru","Dwaraka Tirumala","Ganapavaram","Gopalapuram","Kamavarapu Kota","Kalla","Narsapur","Nidadavole","Palakol","Penumantra","Polavaram","T Narasapuram","Unguturu","Veeravasaram"],
+  "Eluru": ["Eluru","Bhimavaram","Tadepalligudem","Kovvur","Nuzvid","Chintalapudi","Denduluru","Ganapavaram","Kaikaluru","Kalidindi","Kanuru","Koyyalagudem","Linganapalli","Musunuru","Nidadavole","Pedavegi","Unguturu"],
+  "Krishna": ["Vijayawada","Machilipatnam","Gudivada","Nandigama","Mylavaram","Avanigadda","Bantumilli","Bapulapadu","Challapalli","Chandarlapadu","Ghantasala","Gampalagudem","Hanuman Junction","Ibrahimpatnam","Jaggayyapeta","Kankipadu","Koduru","Kruthivennu","Movva","Mudinepalli","Nagayalanka","Nuzvid","Pamarru","Pamidimukkala","Pedana","Penamaluru","Thotlavalluru","Tiruvuru","Unguturu","Vissannapet"],
+  "NTR District": ["Vijayawada","Nandigama","Jaggayyapeta","Mylavaram","Tiruvuru","Nandigama Rural","Kondapalli","Chandarlapadu","Penuganchiprolu","Ibrahimpatnam","Unguturu","Bantumilli"],
+  "Guntur": ["Guntur","Tenali","Narasaraopet","Sattenapalle","Bapatla","Mangalagiri","Atchutapuram","Bellamkonda","Chilakaluripet","Dachepalli","Duggirala","Gurazala","Ipur","Karampudi","Krosuru","Macherla","Martur","Medikonduru","Muppalla","Nadendla","Narsaraopet","Nidubrolu","Palnad","Palnadu","Phirangipuram","Piduguralla","Prathipadu","Rentachintala","Repalle","Rompicherla","Sattanapalle","Stuartpuram","Tadikonda","Tenali Rural","Thullur","Vemuru","Vinukonda"],
+  "Bapatla": ["Bapatla","Addanki","Chirala","Inkollu","Kandukur","Kondepudi","Martur","Nandipadu","Ongole Rural","Parchur","Perala","Repalle","Santhanuthalapadu","Tripuranthakam","Vetapalem"],
+  "Palnadu": ["Narasaraopet","Macherla","Gurazala","Dachepalli","Amaravathi","Bollapalle","Durgi","Ipuru","Karempudi","Krosuru","Macherla Rural","Nadendla","Nereducherla","Phirangipuram","Piduguralla","Rompicherla","Rentachintala","Sthuartpuram","Vinukonda"],
+  "Prakasam": ["Ongole","Chirala","Kandukur","Markapur","Podili","Addanki","Bestawaripeta","CKdinne","Cumbum","Darsi","Dornala","Giddalur","Gudluru","Inkollu","Kanigiri","Komarolu","Kondapi","Kondepi","Kothapatnam","Kurichedu","Mangamuru","Maddipadu","Martur","Mundlamuru","Pamur","Parchur","Pedacherlo","Pernamitta","Pullalacheruvu","Racherla","Santhamagaluru","Singarayakonda","Tallur","Tripuranthakam","Ulavapadu","Veligandla","Vetapalem","Zarugumilli"],
+  "SPSR Nellore": ["Nellore","Kavali","Gudur","Sullurpeta","Atmakur","Allur","Atmakur","Bogole","Buchireddipalem","Chejerla","Chittedu","Chittamur","Dakkili","Duttaluru","Enumamula","Gandavaram","Indukurpet","Jaladanki","Kaluvoya","Kodavalur","Kodur","Kondapuram","Kota","Kovur","Marripadu","Muthukur","Narayananpet","Nellore Rural","Ozili","Padugupadu","Pellakur","Podalakur","Rapur","Sarvepalli","Sangam","Sydapuram","Tada","Thotapalligudur","Udayagiri","Venkatagiri","Vidavalur","Vinjamur"],
+  "Tirupati": ["Tirupati","Chandragiri","Chittoor Rural","Nagalapuram","Naidupeta","Puttur","Renigunta","Srikalahasti","Sullurpeta","Tada","Thottambedu","Tirupati Rural","Venkatagiri","Yerpedu"],
+  "Chittoor": ["Chittoor","Tirupati","Madanapalle","Palamaner","Punganur","Puttur","Srikalahasti","B Kothakota","Bangarupalyam","Baireddipalle","Chandragiri","Gangadhara Nellore","Gudipala","Irala","Kambhamvaripalle","Kuppam","Mulakalacheruvu","Nagari","Pakala","Palamaneru","Pedda Tippa Samudram","Puthalapattu","Renigunta","Thavanampalle","Valmikipuram","Vayalpad"],
+  "YSR Kadapa": ["Kadapa","Proddatur","Jammalamadugu","Badvel","Rajampet","Cuddapah Rural","Chapad","Chinnamandem","Duvvur","Galiveedu","Gopavaram","Kamalapuram","Khajipet","Kodur","Kondapuram","Lakkireddipalle","Maddur","Mylavaram","Obulavaripalle","Ontimitta","Pendlimarri","Porumamilla","Pulivendula","Rajampet Rural","Rayachoti","Sambepalle","Siddavatam","Sidhout","T Sundupalle","Vallur","Vempalle","Vontimitta"],
+  "Anantapur": ["Anantapur","Dharmavaram","Guntakal","Kadiri","Rayadurgam","Tadipatri","Atmakur","Beluguppa","Bommanahal","Brahmasamudram","Buchaiahnpet","D Hirehal","Gorantla","Gudibanda","Hindupur","Kanaganapalle","Kanekal","Kundurpi","Lepakshi","Madakasira","Mudigubba","Nallamada","Nallacheruvu","Narpala","Obuladevaracheruvu","Pamidi","Peddavaduguru","Penukonda","Ramagiri","Raptadu","Roddam","Sabbavaram","Settur","Singanamala","Somandepalle","Tadimarri","Uravakonda","Vidapanakal","Yadiki"],
+  "Sri Sathya Sai": ["Puttaparthi","Hindupur","Dharmavaram","Kadiri","Penukonda","Amarapuram","Kothacheruvu","Lepakshi","Mudigubba","Nallamada","Nambula Pulakunta","Obuladevaracheruvu","Parigi","Ramagiri","Roddam","Somandepalle","Tanakal","Yadiki"],
+  "Kurnool": ["Kurnool","Nandyal","Adoni","Yemmiganur","Atmakur","Allagadda","Banaganapalle","Bethamcherla","Chippagiri","Devanakonda","Dhone","Dornipadu","Gadivemula","Gospadu","Gudur","Halaharvi","Holagunda","Kallur","Kodumur","Kolimigundla","Koilkuntla","Kosigi","Krishnagiri","Maddikera","Mahanandi","Midthur","Nandikotkur","Nandyal Rural","Orvakal","Owk","Pagidyala","Pattikonda","Peapully","Rudravaram","Srisailam","Santhanutalapadu","Sirvel","Tuggali","Uyyalawada","Velgode","Veldurthi"],
+  "Nandyal": ["Nandyal","Allagadda","Banaganapalle","Bethamcherla","Koilkuntla","Atmakur","Gospadu","Kolimigundla","Mahanandi","Nandikotkur","Nandyal Rural","Pattikonda","Rudravaram","Srisailam","Velgode"]
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// COMPANY / BRAND / DISTRICT STRUCTURE
+// ═══════════════════════════════════════════════════════════════════
+var ORG_STRUCTURE = {
+  "Ramcor": {
+    brands: [
+      "Eicher - Sales","Eicher - Service",
+      "Atul - Sales","Atul - Service",
+      "JEM - Sales","JEM - Service",
+      "Admin / HR"
+    ],
+    districts: {
+      "Eicher - Sales":   ["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru"],
+      "Eicher - Service": ["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru"],
+      "Atul - Sales":     ["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru","Visakhapatnam"],
+      "Atul - Service":   ["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru","Visakhapatnam"],
+      "JEM - Sales":      ["Krishna","NTR District","Guntur"],
+      "JEM - Service":    ["Krishna","NTR District","Guntur"],
+      "Admin / HR":       ["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru","Visakhapatnam","Srikakulam","Vizianagaram","Kakinada","East Godavari","Prakasam","SPSR Nellore","Tirupati","Chittoor","YSR Kadapa","Anantapur","Kurnool","Nandyal"]
+    }
+  },
+  "Garapati Autoventures Pvt Ltd": {
+    brands: [
+      "TVS - Sales","TVS - Service",
+      "Polaris - Sales","Polaris - Service",
+      "Admin / HR"
+    ],
+    districts: {
+      "TVS - Sales":      ["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru","Visakhapatnam"],
+      "TVS - Service":    ["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru","Visakhapatnam"],
+      "Polaris - Sales":  ["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru","Visakhapatnam"],
+      "Polaris - Service":["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru","Visakhapatnam"],
+      "Admin / HR":       ["Krishna","NTR District","Guntur","Palnadu","West Godavari","Eluru","Visakhapatnam","Srikakulam","Vizianagaram","Kakinada","East Godavari","Prakasam","SPSR Nellore","Tirupati","Chittoor","YSR Kadapa","Anantapur","Kurnool","Nandyal"]
+    }
+  },
+  "Garapati Petrol & Diesel Station": {
+    brands: ["Fuel Station Staff","Fuel Station Admin"],
+    districts: {
+      "Fuel Station Staff": ["Krishna","NTR District","Guntur"],
+      "Fuel Station Admin": ["Krishna","NTR District","Guntur"]
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// AUTH STATE
+// ═══════════════════════════════════════════════════════════════════
+var currentRole = null; // 'hr' or 'employee'
+var currentEmployee = null;
+var HR_CREDS = { userid: 'HR001', password: 'ramcor@hr2024' };
+
+function loadAuthCreds() {
+  try {
+    var c = JSON.parse(localStorage.getItem('ap_hr_creds') || 'null');
+    if (c && c.userid && c.password) HR_CREDS = c;
+  } catch(e) {}
+}
+loadAuthCreds();
+
+function switchLoginTab(tab) {
+  document.getElementById('ltab-hr').classList.toggle('active', tab === 'hr');
+  document.getElementById('ltab-emp').classList.toggle('active', tab === 'emp');
+  document.getElementById('hr-login-form').classList.toggle('hidden', tab !== 'hr');
+  document.getElementById('emp-login-form').classList.toggle('hidden', tab !== 'emp');
+}
+
+function doHRLogin() {
+  var uid = document.getElementById('hr-userid').value.trim();
+  var pw  = document.getElementById('hr-password').value;
+  if (uid === HR_CREDS.userid && pw === HR_CREDS.password) {
+    currentRole = 'hr';
+    showMainApp('hr');
+  } else {
+    document.getElementById('hr-login-err').textContent = '❌ Invalid credentials. Try HR001 / ramcor@hr2024';
+  }
+}
+
+function doEmpLogin() {
+  var eid = document.getElementById('emp-login-id').value.trim();
+  if (!eid) { document.getElementById('emp-login-err').textContent = '❌ Enter your Employee ID'; return; }
+  var emp = registered.find(function(e) { return e.empid === eid; });
+  if (!emp) {
+    document.getElementById('emp-login-err').textContent = '❌ Employee ID not found. Contact HR to register.';
+    return;
+  }
+  currentRole = 'employee';
+  currentEmployee = emp;
+  showMainApp('employee');
+}
+
+function showMainApp(role) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-hdr').style.display = 'flex';
+  document.getElementById('main-screens').style.display = 'block';
+
+  if (role === 'hr') {
+    document.getElementById('hr-bnav').style.display = 'flex';
+    document.getElementById('emp-bnav').style.display = 'none';
+    document.getElementById('hdr-role-badge').textContent = 'HR';
+    document.getElementById('hdr-role-badge').className = 'hdr-role';
+    // Show HR screens
+    populateOrgSelects();
+    populateLogFilters();
+    goTo('home');
+  } else {
+    document.getElementById('hr-bnav').style.display = 'none';
+    document.getElementById('emp-bnav').style.display = 'flex';
+    document.getElementById('hdr-role-badge').textContent = currentEmployee.name.split(' ')[0];
+    document.getElementById('hdr-role-badge').className = 'hdr-role emp-role';
+    populateOrgSelects();
+    goToEmp('myatt');
+  }
+}
+
+function doLogout() {
+  currentRole = null;
+  currentEmployee = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('main-hdr').style.display = 'none';
+  document.getElementById('main-screens').style.display = 'none';
+  document.getElementById('hr-bnav').style.display = 'none';
+  document.getElementById('emp-bnav').style.display = 'none';
+  // Stop cameras
+  if (attStream) { attStream.getTracks().forEach(function(t){t.stop();}); attStream = null; }
+  if (regStream) { regStream.getTracks().forEach(function(t){t.stop();}); regStream = null; }
+  if (detLoop) { clearInterval(detLoop); detLoop = null; }
+  document.getElementById('hr-userid').value = '';
+  document.getElementById('hr-password').value = '';
+  document.getElementById('emp-login-id').value = '';
+  document.getElementById('hr-login-err').textContent = '';
+  document.getElementById('emp-login-err').textContent = '';
+}
+
+// Employee navigation
+function goToEmp(name) {
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  if (name === 'myatt') {
+    document.getElementById('scr-myatt').classList.add('active');
+    document.getElementById('nav-myatt').classList.add('active');
+    document.getElementById('nav-myattend').classList.remove('active');
+    renderMyAtt();
+  } else if (name === 'attendance') {
+    document.getElementById('scr-attendance').classList.add('active');
+    document.getElementById('nav-myattend').classList.add('active');
+    document.getElementById('nav-myatt').classList.remove('active');
+    document.getElementById('face-count-badge').textContent = registered.length + ' Registered';
+    document.getElementById('att-loading').classList.toggle('hidden', modelsLoaded);
+    resetAttResult();
+    if(!attStream){setTimeout(function(){startAttCam();},400);} else if(modelsLoaded&&!detLoop){startDetection();}
+  }
+}
+
+function renderMyAtt() {
+  if (!currentEmployee) return;
+  var myLogs = logs.filter(function(r){ return r.empid === currentEmployee.empid; });
+  document.getElementById('myatt-name').textContent = currentEmployee.name;
+  document.getElementById('myatt-details').textContent = currentEmployee.empid + ' · ' + currentEmployee.organisation + ' · ' + currentEmployee.district;
+  document.getElementById('myatt-total').textContent = myLogs.length;
+  document.getElementById('myatt-in').textContent  = myLogs.filter(function(r){return r.status==='IN';}).length;
+  document.getElementById('myatt-out').textContent = myLogs.filter(function(r){return r.status==='OUT';}).length;
+  var el = document.getElementById('myatt-list');
+  if (!myLogs.length) {
+    el.innerHTML = '<p class="ldr-txt" style="padding:30px">No attendance records found for your ID.</p>';
+    return;
+  }
+  el.innerHTML = myLogs.map(function(r) {
+    var isIn = r.status === 'IN';
+    return '<div class="log-item">' +
+      '<div class="log-av ' + (isIn?'av-in':'av-out') + '">' + (isIn?'↗':'↙') + '</div>' +
+      '<div class="log-body">' +
+        '<strong>' + r.date + '</strong>' +
+        '<span>' + r.time + ' · ' + (r.brand||r.organisation||'') + ' · ' + (r.district||'') + (r.mandal?' · '+r.mandal:'') + (r.faceVerified?' ✓':' ⚠')+(r.gps?' 📍':'') + '</span>' +
+      '</div>' +
+      '<div class="log-badge ' + (isIn?'lb-in':'lb-out') + '">' + r.status + (r.subStatus?' · '+r.subStatus:'') + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// POPULATE SELECTS
+// ═══════════════════════════════════════════════════════════════════
+function populateOrgSelects() {
+  ['att-org','reg-org'].forEach(function(id) {
+    var sel = document.getElementById(id);
+    if (!sel) return;
+    var val = sel.value;
+    sel.innerHTML = '<option value="">— Select Organisation —</option>';
+    Object.keys(ORG_STRUCTURE).forEach(function(org) {
+      var o = document.createElement('option');
+      o.value = org; o.textContent = org;
+      sel.appendChild(o);
+    });
+    if (val) sel.value = val;
+  });
+  buildOrgStructureDisplay();
+}
+
+function populateLogFilters() {
+  var sel = document.getElementById('log-filter-org');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">All Organisations</option>';
+  Object.keys(ORG_STRUCTURE).forEach(function(org) {
+    var o = document.createElement('option');
+    o.value = org; o.textContent = org;
+    sel.appendChild(o);
+  });
+}
+
+function buildOrgStructureDisplay() {
+  var el = document.getElementById('org-structure-list');
+  if (!el) return;
+  el.innerHTML = Object.keys(ORG_STRUCTURE).map(function(org) {
+    return ORG_STRUCTURE[org].brands.map(function(brand) {
+      var dists = ORG_STRUCTURE[org].districts[brand] || [];
+      return '<p class="txt-small mt10"><strong>' + org + '</strong> — <span style="color:var(--gold)">' + brand + '</span><br><span style="color:var(--text3)">' + dists.join(', ') + '</span></p>';
+    }).join('');
+  }).join('<div class="divider"></div>');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BRAND / DISTRICT / MANDAL CASCADES
+// ═══════════════════════════════════════════════════════════════════
+function updateBrand(prefix) {
+  var org = document.getElementById(prefix+'-org').value;
+  var brandSel = document.getElementById(prefix+'-brand');
+  var distSel  = document.getElementById(prefix+'-district');
+  var mandalSel = document.getElementById(prefix+'-mandal');
+  brandSel.innerHTML = '<option value="">— Select Brand —</option>';
+  distSel.innerHTML  = '<option value="">— Select District —</option>';
+  if (mandalSel) mandalSel.innerHTML = '<option value="">— Select Mandal —</option>';
+  if (!org || !ORG_STRUCTURE[org]) return;
+  ORG_STRUCTURE[org].brands.forEach(function(b) {
+    var o = document.createElement('option'); o.value = b; o.textContent = b;
+    brandSel.appendChild(o);
+  });
+  if (ORG_STRUCTURE[org].brands.length === 1) {
+    brandSel.value = ORG_STRUCTURE[org].brands[0];
+    updateBranch(prefix);
+  }
+}
+
+function updateBranch(prefix) {
+  var org   = document.getElementById(prefix+'-org').value;
+  var brand = document.getElementById(prefix+'-brand').value;
+  var distSel  = document.getElementById(prefix+'-district');
+  var mandalSel = document.getElementById(prefix+'-mandal');
+  distSel.innerHTML = '<option value="">— Select District —</option>';
+  if (mandalSel) mandalSel.innerHTML = '<option value="">— Select Mandal —</option>';
+  if (!org || !brand || !ORG_STRUCTURE[org]) return;
+  var dists = ORG_STRUCTURE[org].districts[brand] || [];
+  dists.forEach(function(d) {
+    var o = document.createElement('option'); o.value = d; o.textContent = d;
+    distSel.appendChild(o);
+  });
+}
+
+function updateMandal(prefix) {
+  var dist = document.getElementById(prefix+'-district').value;
+  var mandalSel = document.getElementById(prefix+'-mandal');
+  if (!mandalSel) return;
+  mandalSel.innerHTML = '<option value="">— Select Mandal —</option>';
+  if (!dist || !AP_DISTRICTS[dist]) return;
+  AP_DISTRICTS[dist].forEach(function(m) {
+    var o = document.createElement('option'); o.value = m; o.textContent = m;
+    mandalSel.appendChild(o);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+var modelsLoaded = false;
+var faceDetected = false;
+var recognizedEmployee = null;
+var attStream = null;
+var regStream = null;
+var detLoop = null;
+var regDescriptor = null;
+var registered = [];
+var logs = [];
+var sheetUrl = '';
+var livePings = {};
+var liveWatchId = null;
+
+var DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz95u66rCyHR4uebjq_zIAeliSB-fLKMwX0HHa2e9P3zpenOjFMZ90nzHIHzlG1WaAD/exec';
+
+function loadState() {
+  try { registered = JSON.parse(localStorage.getItem('ap_reg_v2') || '[]'); } catch(e) { registered = []; }
+  try { logs = JSON.parse(localStorage.getItem('ap_log_v2') || '[]'); } catch(e) { logs = []; }
+  sheetUrl = localStorage.getItem('ap_sheet') || '';
+  try { livePings = JSON.parse(localStorage.getItem('ap_live_v1') || '{}'); } catch(e) { livePings = {}; }
+  // Auto-deploy the default Google Sheets Web App URL if none has been set yet,
+  // or upgrade automatically if the previously auto-saved default URL is outdated.
+  var PREV_DEFAULT_URLS = ['https://script.google.com/macros/s/AKfycbzsk9zOCsTjN3I_w0KGZZzprVJqoJ6Pecm2W3d-MBnChpSk6iORW7ZRRKht3nEPO698/exec','https://script.google.com/macros/s/AKfycbwLDJ8M5srbNyqZQ0hGnqv8DMZsQSwpz3SJXvuCIg7ue7LRBgA30_CIUYK23LVwpZTp/exec'];
+  if (!sheetUrl || PREV_DEFAULT_URLS.indexOf(sheetUrl) !== -1) {
+    sheetUrl = DEFAULT_SHEET_URL;
+    localStorage.setItem('ap_sheet', sheetUrl);
+  }
+}
+loadState();
+
+// ═══════════════════════════════════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════════════════════════════════
+function tick() {
+  var n = new Date();
+  document.getElementById('hdr-clock').textContent = n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+  document.getElementById('hdr-date').textContent   = n.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  var hd = document.getElementById('home-date');
+  if (hd) hd.textContent = n.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+setInterval(tick,1000); tick();
+
+// ═══════════════════════════════════════════════════════════════════
+// NAVIGATION (HR)
+// ═══════════════════════════════════════════════════════════════════
+function goTo(name) {
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('scr-'+name).classList.add('active');
+  var navEl = document.getElementById('nav-'+name);
+  if (navEl) navEl.classList.add('active');
+  if (name==='log') { renderLog(); renderLiveList(); }
+  if (name==='home') updateStats();
+  if (name==='register') { loadRegList(); if (!regStream) startRegCam(); }
+  if (name==='admin') {
+    renderAdminEmpList(); document.getElementById('admin-emp-count').textContent = registered.length;
+    var _su=document.getElementById('sheet-url'); if(_su&&sheetUrl) _su.value=sheetUrl;
+  }
+  if (name==='attendance') {
+    document.getElementById('face-count-badge').textContent = registered.length+' Registered';
+    document.getElementById('att-loading').classList.toggle('hidden', modelsLoaded);
+    resetAttResult();
+    if(!attStream){
+      setTimeout(function(){
+        startAttCam();
+        // If on file:// protocol, pre-show the upload fallback immediately
+        if (location.protocol === 'file:' || (location.href && location.href.indexOf('content://') === 0)) {
+          setTimeout(function(){ showPhotoUploadFallback('cam-foot'); }, 600);
+        }
+      },400);
+    } else if(modelsLoaded&&!detLoop){startDetection();}
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ADMIN PANEL TABS
+// ═══════════════════════════════════════════════════════════════════
+function adminTab(tab) {
+  ['employees','passwords','backup'].forEach(function(t) {
+    document.getElementById('admin-tab-'+t).classList.toggle('hidden', t !== tab);
+  });
+  document.querySelectorAll('.sec-tab').forEach(function(el, i) {
+    el.classList.toggle('active', ['employees','passwords','backup'][i] === tab);
+  });
+  if (tab === 'employees') renderAdminEmpList();
+}
+
+function renderAdminEmpList() {
+  var q = (document.getElementById('admin-emp-search') && document.getElementById('admin-emp-search').value.toLowerCase()) || '';
+  var filtered = registered.filter(function(e) {
+    return !q || e.name.toLowerCase().includes(q) || e.empid.toLowerCase().includes(q);
+  });
+  document.getElementById('admin-emp-count').textContent = registered.length;
+  var el = document.getElementById('admin-emp-list');
+  if (!filtered.length) {
+    el.innerHTML = '<p class="ldr-txt" style="padding:14px">' + (q?'No matches.':'No employees registered yet.') + '</p>';
+    return;
+  }
+  el.innerHTML = filtered.map(function(e) {
+    var attCount = logs.filter(function(r){return r.empid===e.empid;}).length;
+    return '<div class="emp-chip">' +
+      '<div class="ec-info">' +
+        '<strong>' + e.name + '</strong>' +
+        '<span>' + e.empid + ' · ' + e.organisation + ' · ' + e.brand + '<br>' + e.district + (e.mandal?' → '+e.mandal:'') + ' · ' + attCount + ' records</span>' +
+      '</div>' +
+      '<div class="ec-actions">' +
+        '<button class="ec-del" onclick="removeReg(\''+e.empid.replace(/'/g,"\\'")+'\')">Remove</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function changePassword() {
+  var curr = document.getElementById('pw-current').value;
+  var nw   = document.getElementById('pw-new').value;
+  var conf = document.getElementById('pw-confirm').value;
+  var msg  = document.getElementById('pw-msg');
+  if (curr !== HR_CREDS.password) { msg.style.color='var(--red)'; msg.textContent='❌ Current password incorrect.'; return; }
+  if (nw.length < 6) { msg.style.color='var(--red)'; msg.textContent='❌ New password must be at least 6 characters.'; return; }
+  if (nw !== conf) { msg.style.color='var(--red)'; msg.textContent='❌ Passwords do not match.'; return; }
+  HR_CREDS.password = nw;
+  localStorage.setItem('ap_hr_creds', JSON.stringify(HR_CREDS));
+  msg.style.color='var(--green)'; msg.textContent='✅ Password updated successfully!';
+  document.getElementById('pw-current').value = '';
+  document.getElementById('pw-new').value = '';
+  document.getElementById('pw-confirm').value = '';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LOAD FACE-API MODELS
+// ═══════════════════════════════════════════════════════════════════
+var MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model/';
+
+function loadModels() {
+  setMsg('loader-msg','Loading Tiny Face Detector…');
+  faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)
+    .then(function(){
+      setMsg('loader-msg','Loading Face Landmark model…');
+      return faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL);
+    }).then(function(){
+      setMsg('loader-msg','Loading Face Recognition model…');
+      return faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+    }).then(function(){
+      modelsLoaded = true;
+      document.getElementById('home-loader').classList.add('hidden');
+      document.getElementById('home-ready').classList.remove('hidden');
+      document.getElementById('att-loading').classList.add('hidden');
+      if(attStream&&!detLoop){startDetection();}
+    }).catch(function(err){
+      setMsg('loader-msg','❌ Error loading AI — check internet & retry.');
+      console.error('Model load failed:',err);
+      setTimeout(loadModels,5000);
+    });
+}
+function setMsg(id,msg){ var el=document.getElementById(id); if(el) el.textContent=msg; }
+window.addEventListener('load',function(){ setTimeout(loadModels,1500); });
+
+// ═══════════════════════════════════════════════════════════════════
+// HOME STATS
+// ═══════════════════════════════════════════════════════════════════
+function updateStats(){
+  document.getElementById('qs-total').textContent = logs.length;
+  document.getElementById('qs-in').textContent    = logs.filter(function(r){return r.status==='IN';}).length;
+  document.getElementById('qs-out').textContent   = logs.filter(function(r){return r.status==='OUT';}).length;
+}
+updateStats();
+
+// ═══════════════════════════════════════════════════════════════════
+// ATTENDANCE CAMERA
+// ═══════════════════════════════════════════════════════════════════
+function showCamError(footId, btnId, err) {
+  var isFileProtocol = location.protocol === 'file:' || (location.href && location.href.indexOf('content://') === 0);
+  var msg = '📷 Camera unavailable — use photo upload below';
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    msg = '📷 Camera not supported — use photo upload below';
+  } else if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+    msg = '📷 Camera permission denied — use photo upload below';
+  } else if (err && (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError')) {
+    msg = '📷 No camera found — use photo upload below';
+  } else if (err && err.name === 'NotReadableError') {
+    msg = '📷 Camera busy — close other apps or use photo upload below';
+  } else if (isFileProtocol) {
+    msg = '📷 Camera blocked on local file — use photo upload below';
+  }
+  var foot = document.getElementById(footId);
+  if (foot) foot.textContent = msg;
+  var btn = document.getElementById(btnId);
+  if (btn) { btn.innerHTML = '🔄 Retry Camera'; btn.disabled = false; }
+  // Show inline fallback upload box (no blocking overlay)
+  showPhotoUploadFallback(footId);
+}
+
+function startAttCam(){
+  var btn = document.getElementById('btn-start-cam');
+  if (btn) { btn.innerHTML = '⏳ Starting…'; btn.disabled = true; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showCamError('cam-foot', 'btn-start-cam', null);
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}})
+  .then(function(stream){
+    attStream=stream;
+    var v=document.getElementById('att-video');
+    v.srcObject=stream;
+    v.onloadedmetadata=function(){
+      document.getElementById('cam-foot').textContent='Scanning for face…';
+      document.getElementById('btn-start-cam').innerHTML='🔄 Camera Active';
+      document.getElementById('btn-start-cam').disabled=true;
+      // Hide photo upload fallback if camera now works
+      var box = document.getElementById('att-photo-upload-box');
+      if (box) box.style.display = 'none';
+      if(modelsLoaded) startDetection();
+      else { var w=setInterval(function(){if(modelsLoaded){clearInterval(w);startDetection();}},500); }
+    };
+  }).catch(function(err){
+    showCamError('cam-foot', 'btn-start-cam', err);
+  });
+}
+
+function startDetection(){
+  if(detLoop) clearInterval(detLoop);
+  detLoop=setInterval(detectFaces,800);
+}
+
+function detectFaces(){
+  var v=document.getElementById('att-video');
+  var c=document.getElementById('att-canvas');
+  if(!v||!v.videoWidth) return;
+  c.width=v.videoWidth; c.height=v.videoHeight;
+  faceapi.detectAllFaces(v,new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.45}))
+    .withFaceLandmarks(true).withFaceDescriptors()
+    .then(function(dets){
+      var ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+      var _res=faceapi.resizeResults(dets,{width:v.videoWidth,height:v.videoHeight});
+      faceapi.draw.drawDetections(c,_res);
+      if(dets.length>0){
+        faceDetected=true;
+        var match=(dets[0].descriptor&&registered.length>0)?matchFace(dets[0].descriptor):null;
+        if(match){
+          recognizedEmployee=match;
+          setChip('fc-known','✓ Recognized: '+match.name+' ('+match.empid+')');
+          document.getElementById('cam-foot').textContent='Face recognized!';
+          showRecognizedCard(match);
+          document.getElementById('att-recognized-card').style.display='block';
+          document.getElementById('att-manual-card').style.display='none';
+          document.getElementById('btn-in-recognized').disabled=false;
+          document.getElementById('btn-out-recognized').disabled=false;
+        } else {
+          recognizedEmployee=null;
+          if(registered.length===0){
+            setChip('fc-found','Face found — no employees registered yet');
+          } else {
+            setChip('fc-unknown','⚠ Face NOT in system — fill manually below');
+          }
+          document.getElementById('cam-foot').textContent='Face detected';
+          document.getElementById('att-recognized-card').style.display='none';
+          document.getElementById('att-manual-card').style.display='block';
+          // Update manual card label
+          var lbl = document.getElementById('att-manual-label');
+          if (lbl) lbl.textContent = '(Face not recognized — enter manually)';
+          var warn = document.getElementById('att-manual-warn');
+          if (warn) { warn.className='alert a-warn'; warn.textContent='⚠️ Face detected but not in system. Fill in the form below to mark attendance manually.'; }
+          enableManualButtons(true);
+        }
+      } else {
+        faceDetected=false; recognizedEmployee=null;
+        setChip('fc-idle','No face detected — look at the camera');
+        document.getElementById('cam-foot').textContent='Scanning for face…';
+        document.getElementById('btn-in-recognized').disabled=true;
+        document.getElementById('btn-out-recognized').disabled=true;
+        enableManualButtons(false);
+      }
+    }).catch(function(e){console.warn("Det err",e);});
+}
+
+function showPhotoUploadFallback(footId) {
+  // Determine which screen we're in
+  var isAtt = footId === 'cam-foot';
+  var uploadId = isAtt ? 'att-photo-upload-box' : 'reg-photo-upload-box';
+  if (document.getElementById(uploadId)) return; // already shown
+  var box = document.createElement('div');
+  box.id = uploadId;
+  box.style.cssText = 'margin-top:10px;padding:13px;background:rgba(59,130,246,0.08);border:1.5px dashed rgba(59,130,246,0.4);border-radius:10px;text-align:center';
+  box.innerHTML =
+    '<p style="font-size:12px;color:#93c5fd;font-weight:700;margin-bottom:8px">📁 Upload a photo instead of live camera</p>' +
+    '<input type="file" accept="image/*" capture="user" id="' + uploadId + '-input" style="display:none" onchange="handlePhotoUpload(this,\'' + (isAtt?'att':'reg') + '\')">' +
+    '<button onclick="document.getElementById(\'' + uploadId + '-input\').click()" style="padding:9px 18px;background:linear-gradient(135deg,#3b82f6,#6366f1);border:none;border-radius:8px;color:#fff;font-family:Outfit,sans-serif;font-size:13px;font-weight:700;cursor:pointer">📸 Choose / Take Photo</button>' +
+    '<p style="font-size:10px;color:#64748b;margin-top:7px;line-height:1.5">Works without camera permission.<br>Photo is processed locally — not uploaded anywhere.</p>';
+  // Insert after camera wrap
+  var camWrap = isAtt ? document.querySelector('#scr-attendance .cam-wrap') : document.querySelector('#scr-register .cam-wrap');
+  if (camWrap && camWrap.parentNode) {
+    camWrap.parentNode.insertBefore(box, camWrap.nextSibling);
+  }
+}
+
+function handlePhotoUpload(input, mode) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var statusId = mode === 'att' ? 'cam-foot' : 'reg-cam-foot';
+  var statusEl = document.getElementById(statusId);
+  if (statusEl) statusEl.textContent = '🔍 Processing photo…';
+  var img = new Image();
+  var url = URL.createObjectURL(file);
+  img.onload = function() {
+    // Draw to an offscreen canvas
+    var oc = document.createElement('canvas');
+    oc.width = img.naturalWidth; oc.height = img.naturalHeight;
+    oc.getContext('2d').drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    if (mode === 'att') {
+      // Run face detection on uploaded image
+      if (!modelsLoaded) { if (statusEl) statusEl.textContent = '⏳ AI models loading, please wait…'; return; }
+      faceapi.detectAllFaces(oc, new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.4}))
+        .withFaceLandmarks(true).withFaceDescriptors()
+        .then(function(dets) {
+          if (!dets || dets.length === 0) {
+            if (statusEl) statusEl.textContent = '⚠ No face found in photo — try another photo or fill form manually';
+            setChip('fc-unknown','⚠ No face found in uploaded photo');
+            return;
+          }
+          var match = (dets[0].descriptor && registered.length > 0) ? matchFace(dets[0].descriptor) : null;
+          if (match) {
+            recognizedEmployee = match;
+            setChip('fc-known','✓ Recognized: ' + match.name + ' (' + match.empid + ')');
+            showRecognizedCard(match);
+            document.getElementById('att-recognized-card').style.display = 'block';
+            document.getElementById('att-manual-card').style.display = 'none';
+            document.getElementById('btn-in-recognized').disabled = false;
+            document.getElementById('btn-out-recognized').disabled = false;
+            if (statusEl) statusEl.textContent = '✅ Face recognized from photo!';
+          } else {
+            recognizedEmployee = null;
+            setChip('fc-unknown','⚠ Face not in system — fill form manually');
+            document.getElementById('att-recognized-card').style.display = 'none';
+            document.getElementById('att-manual-card').style.display = 'block';
+            if (statusEl) statusEl.textContent = '⚠ Face not recognized — fill in details manually';
+          }
+        }).catch(function(e) {
+          if (statusEl) statusEl.textContent = '❌ Processing failed — fill form manually';
+          console.error('Photo detection error:', e);
+        });
+    } else {
+      // Registration mode — show captured photo preview
+      var snap = document.getElementById('reg-snap');
+      snap.width = oc.width; snap.height = oc.height;
+      snap.getContext('2d').drawImage(oc, 0, 0);
+      snap.classList.remove('hidden');
+      if (!modelsLoaded) { if (statusEl) statusEl.textContent = '⏳ AI models loading, please wait…'; return; }
+      faceapi.detectAllFaces(oc, new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.4}))
+        .withFaceLandmarks(true).withFaceDescriptors()
+        .then(function(dets) {
+          if (!dets || dets.length === 0) {
+            if (statusEl) statusEl.textContent = '⚠ No face detected — try a clearer photo with good lighting';
+            return;
+          }
+          regDescriptor = Array.from(dets[0].descriptor);
+          document.getElementById('btn-save').disabled = false;
+          if (statusEl) statusEl.textContent = '✅ Face detected from photo! Fill details and tap Save.';
+        }).catch(function(e) {
+          if (statusEl) statusEl.textContent = '❌ Could not process face — try another photo';
+          console.error('Reg photo error:', e);
+        });
+    }
+  };
+  img.onerror = function() { if (statusEl) statusEl.textContent = '❌ Could not load image — try again'; };
+  img.src = url;
+}
+
+function enableManualButtons(e){ document.getElementById('btn-in-manual').disabled=false; document.getElementById('btn-out-manual').disabled=false; }
+function setChip(cls,text){ var c=document.getElementById('face-chip'); c.className='face-chip '+cls; document.getElementById('face-chip-txt').textContent=text; }
+function showRecognizedCard(emp){ document.getElementById('rec-name').textContent=emp.name; document.getElementById('rec-details').textContent=[emp.empid,emp.organisation,emp.brand,emp.district,emp.designation].filter(Boolean).join(' · '); }
+function matchFace(descriptor){
+  var best=null,bestDist=0.55;
+  for(var i=0;i<registered.length;i++){
+    var e=registered[i];
+    if(!e.descriptor||!e.descriptor.length) continue;
+    try{
+      var d=faceapi.euclideanDistance(new Float32Array(descriptor),new Float32Array(e.descriptor));
+      if(d<bestDist){bestDist=d;best=e;}
+    }catch(ex){}
+  }
+  return best;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MARK ATTENDANCE
+// ═══════════════════════════════════════════════════════════════════
+function markAttRecognized(status){
+  if(!recognizedEmployee){alert('Face not recognized.');return;}
+  var e=recognizedEmployee,now=new Date();
+  var subType = status==='IN'
+    ? (document.getElementById('rec-in-type')?document.getElementById('rec-in-type').value:'On Duty')
+    : (document.getElementById('rec-out-type')?document.getElementById('rec-out-type').value:'Office Closing Time');
+  // Disable buttons to prevent double-tap
+  document.getElementById('btn-in-recognized').disabled=true;
+  document.getElementById('btn-out-recognized').disabled=true;
+  document.getElementById('cam-foot').textContent='Capturing GPS location…';
+  function saveWithGPS(gps){
+    var record=buildRecord({name:e.name,empid:e.empid,organisation:e.organisation,brand:e.brand,district:e.district,mandal:e.mandal||'',designation:e.designation,mobile:e.mobile||'',gps:gps,status:status,subStatus:subType,faceVerified:true,now:now});
+    saveRecord(record); showSuccess(record); if(sheetUrl) sendToSheet(record);
+    if(status==='IN'){ startLiveTracking(e.empid,e.name,{organisation:e.organisation,district:e.district,subStatus:subType}); }
+    else { stopLiveTracking(e.empid); }
+  }
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      function(pos){ saveWithGPS(pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6)); },
+      function(){ saveWithGPS(''); },
+      {enableHighAccuracy:true,timeout:6000,maximumAge:30000}
+    );
+  } else { saveWithGPS(''); }
+}
+
+function markAttManual(status){
+  var org=document.getElementById('att-org').value;
+  var brand=document.getElementById('att-brand').value;
+  var dist=document.getElementById('att-district').value;
+  var mandal=document.getElementById('att-mandal').value;
+  var empid=document.getElementById('att-empid').value.trim();
+  var name=document.getElementById('att-name').value.trim();
+  var desig=document.getElementById('att-desig').value.trim();
+  var mobile=document.getElementById('att-mobile').value.trim();
+  if(!name||!empid||!org||!brand||!dist){alert('Please fill: Organisation, Brand, District, Employee ID, and Name.');return;}
+  var subType = status==='IN'
+    ? (document.getElementById('att-in-type')?document.getElementById('att-in-type').value:'On Duty')
+    : (document.getElementById('att-out-type')?document.getElementById('att-out-type').value:'Office Closing Time');
+  var now=new Date();
+  var _existingGps=(document.getElementById('att-gps')&&document.getElementById('att-gps').value)||'';
+  document.getElementById('btn-in-manual').disabled=true;
+  document.getElementById('btn-out-manual').disabled=true;
+  function saveManualWithGPS(gps){
+    var record=buildRecord({name:name,empid:empid,organisation:org,brand:brand,district:dist,mandal:mandal,designation:desig,mobile:mobile,gps:gps,status:status,subStatus:subType,faceVerified:false,now:now});
+    saveRecord(record); showSuccess(record); if(sheetUrl) sendToSheet(record);
+    if(status==='IN'){ startLiveTracking(empid,name,{organisation:org,district:dist,subStatus:subType}); }
+    else { stopLiveTracking(empid); }
+  }
+  if(_existingGps){
+    saveManualWithGPS(_existingGps);
+  } else if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      function(pos){ saveManualWithGPS(pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6)); },
+      function(){ saveManualWithGPS(''); },
+      {enableHighAccuracy:true,timeout:6000,maximumAge:30000}
+    );
+  } else { saveManualWithGPS(''); }
+}
+
+function buildRecord(d){
+  return {
+    timestamp:d.now.toLocaleString('en-IN'),
+    date:d.now.toLocaleDateString('en-IN'),
+    time:d.now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}),
+    name:d.name,empid:d.empid,organisation:d.organisation,brand:d.brand,district:d.district,
+    mandal:d.mandal||'',designation:d.designation||'',mobile:d.mobile||'',
+    status:d.status,subStatus:d.subStatus||'',faceVerified:d.faceVerified,gps:d.gps||''
+  };
+}
+
+function saveRecord(record){ logs.unshift(record); localStorage.setItem('ap_log_v2',JSON.stringify(logs)); updateStats(); }
+
+function showSuccess(r){
+  document.getElementById('att-result').classList.remove('hidden');
+  document.getElementById('suc-icon').textContent=r.status==='IN'?'✅':'🚪';
+  document.getElementById('suc-title').textContent=(r.status==='IN'?'Checked IN':'Checked OUT')+(r.subStatus?' · '+r.subStatus:'')+' Successfully!';
+  document.getElementById('suc-sub').textContent=r.name+(r.faceVerified?' · Face Verified ✓':' · Manual Entry');
+  document.getElementById('suc-id').textContent=r.empid;
+  document.getElementById('suc-org').textContent=r.organisation;
+  document.getElementById('suc-brand').textContent=r.brand;
+  document.getElementById('suc-district').textContent=r.district+(r.mandal?' → '+r.mandal:'');
+  document.getElementById('suc-time').textContent=r.time;
+  document.getElementById('suc-date').textContent=r.date;
+  var gpsEl=document.getElementById('suc-gps');
+  var gpsEl=document.getElementById('suc-gps'); var gpsRow=document.getElementById('suc-gps-row');
+  if(gpsEl&&gpsRow){ if(r.gps){gpsEl.textContent=r.gps;gpsRow.style.display='block';}else{gpsRow.style.display='none';} }
+  document.getElementById('att-result').scrollIntoView({behavior:'smooth'});
+}
+
+function resetAttResult(){
+  document.getElementById('att-result').classList.add('hidden');
+  document.getElementById('att-recognized-card').style.display='none';
+  document.getElementById('att-manual-card').style.display='block';
+  setChip('fc-idle','No face detected — look at the camera');
+  // Restore friendly defaults
+  var lbl = document.getElementById('att-manual-label');
+  if (lbl) lbl.textContent = '(Manual Entry)';
+  var warn = document.getElementById('att-manual-warn');
+  if (warn) { warn.className='alert a-info'; warn.textContent='📝 Fill in employee details below and tap IN / OUT. Camera face recognition will auto-fill details when available.'; }
+  document.getElementById('btn-in-recognized').disabled=true;
+  document.getElementById('btn-out-recognized').disabled=true;
+  ['att-org','att-brand','att-district','att-mandal','att-empid','att-name','att-desig','att-mobile','att-gps'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  var inT=document.getElementById('att-in-type'); if(inT) inT.value='Office';
+  var outT=document.getElementById('att-out-type'); if(outT) outT.value='Office Closing Time';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LIVE LOCATION TRACKING (foreground only, while app is open)
+// ═══════════════════════════════════════════════════════════════════
+function saveLive(){ localStorage.setItem('ap_live_v1', JSON.stringify(livePings)); }
+
+function startLiveTracking(empid, name, meta){
+  if(!empid) return;
+  stopLiveTracking(); // only one active watch per device session
+  livePings[empid] = Object.assign({
+    name:name, empid:empid, lat:null, lng:null, acc:null, ts:Date.now()
+  }, meta||{});
+  saveLive(); renderLiveList();
+  if(!navigator.geolocation) return;
+  liveWatchId = navigator.geolocation.watchPosition(
+    function(pos){
+      if(!livePings[empid]) return; // stopped/checked out meanwhile
+      livePings[empid].lat = pos.coords.latitude;
+      livePings[empid].lng = pos.coords.longitude;
+      livePings[empid].acc = pos.coords.accuracy;
+      livePings[empid].ts  = Date.now();
+      saveLive(); renderLiveList();
+    },
+    function(){ /* permission denied / unavailable — silently ignore */ },
+    {enableHighAccuracy:true, maximumAge:10000, timeout:20000}
+  );
+}
+
+function stopLiveTracking(empid){
+  if(liveWatchId !== null){ navigator.geolocation.clearWatch(liveWatchId); liveWatchId = null; }
+  if(empid && livePings[empid]){ delete livePings[empid]; saveLive(); }
+  renderLiveList();
+}
+
+function renderLiveList(){
+  var el = document.getElementById('live-list');
+  var countEl = document.getElementById('live-count');
+  if(!el) return;
+  var keys = Object.keys(livePings);
+  if(countEl) countEl.textContent = keys.length;
+  if(!keys.length){ el.innerHTML = '<p class="ldr-txt">No one is currently checked in.</p>'; return; }
+  el.innerHTML = keys.map(function(k){
+    var p = livePings[k];
+    var agoSec = p.ts ? Math.max(0, Math.round((Date.now()-p.ts)/1000)) : null;
+    var agoTxt = agoSec===null ? '—' : (agoSec<60 ? agoSec+'s ago' : Math.round(agoSec/60)+'m ago');
+    var coordTxt = (p.lat!=null && p.lng!=null) ? (p.lat.toFixed(5)+', '+p.lng.toFixed(5)) : 'Locating…';
+    var mapLink = (p.lat!=null && p.lng!=null) ? ('https://maps.google.com/?q='+p.lat+','+p.lng) : '';
+    return '<div class="log-item">'+
+      '<div class="log-av av-in">📡</div>'+
+      '<div class="log-body"><strong>'+p.name+'</strong>'+
+      '<span>'+p.empid+' · '+(p.subStatus||'On Duty')+' · '+coordTxt+' · '+agoTxt+'</span></div>'+
+      (mapLink?('<a class="btn btn-dark btn-sm" style="width:auto;padding:6px 10px;text-decoration:none;display:inline-flex" href="'+mapLink+'" target="_blank">🗺 Map</a>'):'')+
+    '</div>';
+  }).join('');
+}
+setInterval(function(){ if(document.getElementById('scr-log')&&document.getElementById('scr-log').classList.contains('active')) renderLiveList(); }, 5000);
+
+// ═══════════════════════════════════════════════════════════════════
+// GOOGLE SHEETS
+// ═══════════════════════════════════════════════════════════════════
+function sendToSheet(data){
+  if(!sheetUrl) return;
+  fetch(sheetUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).catch(function(e){console.log('Sheet sync error:',e);});
+}
+function saveSheetUrl(){
+  var url=document.getElementById('sheet-url').value.trim();
+  var msgEl=document.getElementById('url-msg');
+  if(!url.startsWith('https://script.google.com')){msgEl.textContent='❌ Please enter a valid Google Apps Script URL.';msgEl.style.color='var(--red)';return;}
+  sheetUrl=url; localStorage.setItem('ap_sheet',url);
+  msgEl.textContent='✅ Saved! Attendance will sync to Google Sheets.'; msgEl.style.color='var(--green)';
+}
+function copyScript(){
+  var code=document.getElementById('apps-script-code').textContent;
+  navigator.clipboard.writeText(code).then(function(){alert('✅ Code copied!');}).catch(function(){alert('Please select the code manually and copy.');});
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// REGISTER CAMERA
+// ═══════════════════════════════════════════════════════════════════
+function startRegCam(){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showCamError('reg-cam-foot', null, null);
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}})
+  .then(function(stream){
+    regStream=stream;
+    var v=document.getElementById('reg-video');
+    v.srcObject=stream;
+    v.onloadedmetadata=function(){
+      document.getElementById('reg-cam-foot').textContent='Camera active — look straight ahead';
+      document.getElementById('btn-cap').disabled=false;
+      // Hide photo upload fallback if camera now works
+      var box = document.getElementById('reg-photo-upload-box');
+      if (box) box.style.display = 'none';
+    };
+  }).catch(function(err){
+    showCamError('reg-cam-foot', null, err);
+  });
+}
+
+function captureReg(){
+  if(!modelsLoaded){alert('AI models still loading. Please wait.');return;}
+  var v=document.getElementById('reg-video');
+  if(!v.videoWidth){alert('Camera not started. Tap Camera first.');return;}
+  var snap=document.getElementById('reg-snap');
+  var ctx=snap.getContext('2d');
+  snap.width=v.videoWidth; snap.height=v.videoHeight;
+  ctx.drawImage(v,0,0); snap.classList.remove('hidden');
+  setMsg('reg-status','🔍 Detecting face…');
+  faceapi.detectSingleFace(snap,new faceapi.TinyFaceDetectorOptions({inputSize:320}))
+    .withFaceLandmarks(true).withFaceDescriptor()
+    .then(function(det){
+      if(det&&det.descriptor){
+        regDescriptor=Array.from(det.descriptor);
+        var _ctx=snap.getContext('2d'); var _b=det.detection.box;
+        _ctx.strokeStyle='#f0b429'; _ctx.lineWidth=3; _ctx.strokeRect(_b.x,_b.y,_b.width,_b.height);
+        setMsg('reg-status','✅ Face detected & captured! Fill details and tap Save Employee.');
+        document.getElementById('btn-save').disabled=false;
+      } else {
+        setMsg('reg-status','❌ No face detected. Move closer, improve lighting & look straight.');
+        regDescriptor=null; document.getElementById('btn-save').disabled=true;
+      }
+    }).catch(function(e){ setMsg('reg-status','❌ Error: '+e.message); regDescriptor=null; document.getElementById('btn-save').disabled=true; });
+}
+
+function saveReg(){
+  var empid=document.getElementById('reg-empid').value.trim();
+  var name =document.getElementById('reg-name').value.trim();
+  var org  =document.getElementById('reg-org').value;
+  var brand=document.getElementById('reg-brand').value;
+  var dist =document.getElementById('reg-district').value;
+  var mandal=document.getElementById('reg-mandal').value;
+  var desig=document.getElementById('reg-desig').value.trim();
+
+  if(!empid){alert('❌ Employee ID is required.');return;}
+  if(!name){alert('❌ Full Name is required.');return;}
+  if(!org){alert('❌ Please select Organisation.');return;}
+  if(!brand){alert('❌ Please select Brand / Division.');return;}
+  if(!dist){alert('❌ Please select District.');return;}
+  if(!desig){alert('❌ Designation is required.');return;}
+  if(!regDescriptor){alert('❌ Please capture face photo first. Tap Camera → Capture.');return;}
+
+  var existing=registered.findIndex(function(e){return e.empid===empid;});
+  var empObj={
+    empid:empid,name:name,organisation:org,brand:brand,district:dist,mandal:mandal,
+    designation:desig,mobile:document.getElementById('reg-mobile').value.trim(),
+    email:document.getElementById('reg-email').value.trim(),
+    gps:(document.getElementById('reg-gps')&&document.getElementById('reg-gps').value)||'',
+    descriptor:regDescriptor,registeredAt:new Date().toLocaleString('en-IN')
+  };
+
+  if(existing>=0){
+    if(!confirm('Employee ID '+empid+' already exists ('+registered[existing].name+'). Update their record?')) return;
+    registered[existing]=empObj;
+    localStorage.setItem('ap_reg_v2',JSON.stringify(registered));
+    regDescriptor=null; document.getElementById('btn-save').disabled=true;
+    document.getElementById('reg-snap').classList.add('hidden');
+    setMsg('reg-status','✅ '+name+' ('+empid+') updated successfully!');
+  } else {
+    registered.push(empObj);
+    localStorage.setItem('ap_reg_v2',JSON.stringify(registered));
+    regDescriptor=null; document.getElementById('btn-save').disabled=true;
+    document.getElementById('reg-snap').classList.add('hidden');
+    setMsg('reg-status','✅ '+name+' ('+empid+') registered successfully!');
+  }
+
+  // Clear form
+  ['reg-empid','reg-name','reg-desig','reg-mobile','reg-email','reg-gps'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['reg-org','reg-brand','reg-district','reg-mandal'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('reg-brand').innerHTML='<option value="">— Select Brand —</option>';
+  document.getElementById('reg-district').innerHTML='<option value="">— Select District —</option>';
+  document.getElementById('reg-mandal').innerHTML='<option value="">— Select Mandal —</option>';
+  loadRegList();
+}
+
+function getRegGPS(btn){
+  if(!navigator.geolocation){alert("Geolocation not supported.");return;}
+  var orig=btn.textContent; btn.textContent="📡..."; btn.disabled=true;
+  navigator.geolocation.getCurrentPosition(function(p){
+    document.getElementById("reg-gps").value=p.coords.latitude.toFixed(6)+","+p.coords.longitude.toFixed(6);
+    btn.textContent=orig; btn.disabled=false;
+  },function(e){alert("Location error: "+e.message);btn.textContent=orig;btn.disabled=false;},{enableHighAccuracy:true,timeout:10000});
+}
+function getAttGPS(btn){
+  if(!navigator.geolocation){alert("Geolocation not supported.");return;}
+  var orig=btn.textContent; btn.textContent="📡..."; btn.disabled=true;
+  navigator.geolocation.getCurrentPosition(function(p){
+    var f=document.getElementById("att-gps");if(f)f.value=p.coords.latitude.toFixed(6)+","+p.coords.longitude.toFixed(6);
+    btn.textContent=orig;btn.disabled=false;
+  },function(e){btn.textContent=orig;btn.disabled=false;},{enableHighAccuracy:true,timeout:8000});
+}
+function loadRegList(){
+  var q=(document.getElementById('reg-search')&&document.getElementById('reg-search').value.toLowerCase())||'';
+  document.getElementById('reg-count').textContent=registered.length;
+  var el=document.getElementById('reg-list');
+  var filtered=registered.filter(function(e){return !q||e.name.toLowerCase().includes(q)||e.empid.toLowerCase().includes(q);});
+  if(!filtered.length){el.innerHTML='<p class="ldr-txt" style="padding:14px">'+(q?'No matches found.':'No employees registered yet')+'</p>';return;}
+  el.innerHTML=filtered.map(function(e){
+    return '<div class="emp-chip">'+
+      '<div class="ec-info"><strong>'+e.name+'</strong><span>'+e.empid+' · '+e.organisation+' · '+e.brand+'<br>'+e.district+(e.mandal?' → '+e.mandal:'')+' · '+e.designation+'</span></div>'+
+      '<button class="ec-del" onclick="removeReg(\''+e.empid.replace(/'/g,"\\'")+'\')" >Remove</button>'+
+    '</div>';
+  }).join('');
+}
+
+function removeReg(id){
+  var emp=registered.find(function(e){return e.empid===id;});
+  if(!emp) return;
+  if(!confirm('Remove '+emp.name+' ('+id+') from registration? This will also remove their login access.')) return;
+  registered=registered.filter(function(e){return e.empid!==id;});
+  localStorage.setItem('ap_reg_v2',JSON.stringify(registered));
+  loadRegList();
+  renderAdminEmpList();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LOG (HR FULL VIEW)
+// ═══════════════════════════════════════════════════════════════════
+function renderLog(){
+  var orgF=document.getElementById('log-filter-org').value;
+  var statusF=document.getElementById('log-filter-status').value;
+  var searchQ=(document.getElementById('log-search')&&document.getElementById('log-search').value.toLowerCase())||'';
+  var filtered=logs.filter(function(r){
+    return (!orgF||r.organisation===orgF)&&
+           (!statusF||r.status===statusF)&&
+           (!searchQ||(r.name&&r.name.toLowerCase().includes(searchQ))||(r.empid&&r.empid.toLowerCase().includes(searchQ)));
+  });
+  document.getElementById('ls-total').textContent=filtered.length;
+  document.getElementById('ls-in').textContent=filtered.filter(function(r){return r.status==='IN';}).length;
+  document.getElementById('ls-out').textContent=filtered.filter(function(r){return r.status==='OUT';}).length;
+  var el=document.getElementById('log-list');
+  if(!filtered.length){el.innerHTML='<p class="ldr-txt" style="padding:30px">No records match the filter.</p>';return;}
+  el.innerHTML=filtered.map(function(r){
+    var isIn=r.status==='IN';
+    return '<div class="log-item">'+
+      '<div class="log-av '+(isIn?'av-in':'av-out')+'">'+(isIn?'↗':'↙')+'</div>'+
+      '<div class="log-body"><strong>'+r.name+'</strong>'+
+      '<span>'+r.empid+' · '+(r.brand||r.organisation||'')+' · '+(r.district||'')+(r.mandal?' → '+r.mandal:'')+' · '+r.time+(r.faceVerified?' ✓':' ⚠')+(r.gps?' 📍':'')+'</span></div>'+
+      '<div class="log-badge '+(isIn?'lb-in':'lb-out')+'">'+r.status+(r.subStatus?' · '+r.subStatus:'')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function clearLog(){
+  if(!confirm('Clear ALL attendance records? This cannot be undone.')) return;
+  logs=[]; localStorage.setItem('ap_log_v2','[]'); renderLog(); updateStats();
+}
+
+function exportCSV(){
+  if(!logs.length){alert('No records to export.');return;}
+  var headers=['Timestamp','Organisation','Brand','District','Mandal','Employee ID','Name','Designation','Mobile number','Log in/out','Status','Date','Time','Face Verified','GPS','Map Link'];
+  var rows=logs.map(function(r){
+    var mapLink=r.gps?('https://maps.google.com/?q='+r.gps):'';
+    return [r.timestamp,r.organisation||'',r.brand||'',r.district||'',r.mandal||'',r.empid,r.name,r.designation||'',r.mobile||'',r.status,r.subStatus||'',r.date,r.time,r.faceVerified?'YES':'NO',r.gps||'',mapLink]
+      .map(function(v){return '"'+String(v||'').replace(/"/g,'""')+'"';}).join(',');
+  });
+  var csv=[headers.join(',')].concat(rows).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='AP_Attendance_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+function exportRegistrations(){
+  if(!registered.length){alert('No registrations to export.');return;}
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(registered,null,2)],{type:'application/json'}));
+  a.download='AP_Registrations_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+}
+
+function importRegistrations(){document.getElementById('import-file').click();}
+
+function handleImport(event){
+  var file=event.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      if(!Array.isArray(data)) throw new Error('Invalid format');
+      var merged=registered.slice(),added=0;
+      data.forEach(function(emp){
+        if(!emp.empid||!emp.name) return;
+        var idx=merged.findIndex(function(r){return r.empid===emp.empid;});
+        if(idx>=0) merged[idx]=emp; else{merged.push(emp);added++;}
+      });
+      registered=merged; localStorage.setItem('ap_reg_v2',JSON.stringify(registered));
+      alert('✅ Imported '+data.length+' records ('+added+' new, rest updated).');
+      loadRegList();
+    }catch(err){alert('❌ Invalid file. Please export from this app only.');}
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+</script>
+
+<!-- ═══ PWA INSTALL BANNERS ═══ -->
+<!-- Android / Chrome install banner -->
+<div id="pwa-banner">
+  <div class="pwa-icon">📋</div>
+  <div class="pwa-txt">
+    <strong>Install RC Attendance</strong>
+    <span>Add to Home Screen — works offline!</span>
+  </div>
+  <button class="pwa-install" onclick="pwaInstall()">Install</button>
+  <button class="pwa-close" onclick="pwaDismiss()">✕</button>
+</div>
+
+<!-- iOS Safari install banner -->
+<div id="ios-banner">
+  <div class="ios-row">
+    <div class="pwa-icon" style="width:44px;height:44px;background:linear-gradient(135deg,#f0b429,#f97316);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📋</div>
+    <div class="ios-txt">
+      <strong>Install RC Attendance</strong>
+      <span>Add to Home Screen for app experience</span>
+    </div>
+    <button class="ios-close" onclick="iosDismiss()">✕</button>
+  </div>
+  <div class="ios-steps">
+    1. Tap the <b>Share button</b> (□↑) at the bottom of Safari<br>
+    2. Scroll down and tap <b>"Add to Home Screen"</b><br>
+    3. Tap <b>"Add"</b> — app icon appears on your home screen!
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  SERVICE WORKER — enables offline + camera
+// ══════════════════════════════════════════════
+(function(){
+  if(!('serviceWorker' in navigator)) return;
+
+  // Build SW as a Blob so no external file needed
+  var swCode = `
+const CACHE = 'rc-attendance-v1';
+self.addEventListener('install', function(e){
+  e.waitUntil(
+    caches.open(CACHE).then(function(c){
+      return c.addAll([]);
+    })
+  );
+  self.skipWaiting();
+});
+self.addEventListener('activate', function(e){
+  e.waitUntil(clients.claim());
+});
+self.addEventListener('fetch', function(e){
+  // Pass through — let network handle it; cache only on success
+  e.respondWith(
+    fetch(e.request).catch(function(){
+      return caches.match(e.request);
+    })
+  );
+});
+`;
+  var blob = new Blob([swCode], {type:'application/javascript'});
+  var swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl, {scope: './'})
+    .then(function(reg){ console.log('SW registered'); })
+    .catch(function(err){ console.log('SW error:', err); });
+})();
+
+// ══════════════════════════════════════════════
+//  PWA INSTALL PROMPT
+// ══════════════════════════════════════════════
+var _deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  _deferredPrompt = e;
+  // Show banner after 2 seconds if not already installed
+  if(!window.matchMedia('(display-mode: standalone)').matches){
+    setTimeout(function(){
+      var b = document.getElementById('pwa-banner');
+      if(b) b.style.display = 'flex';
+    }, 2000);
+  }
+});
+
+function pwaInstall(){
+  var b = document.getElementById('pwa-banner');
+  if(b) b.style.display = 'none';
+  if(!_deferredPrompt) return;
+  _deferredPrompt.prompt();
+  _deferredPrompt.userChoice.then(function(r){
+    if(r.outcome === 'accepted'){
+      console.log('PWA installed');
+    }
+    _deferredPrompt = null;
+  });
+}
+
+function pwaDismiss(){
+  var b = document.getElementById('pwa-banner');
+  if(b) b.style.display = 'none';
+}
+
+function iosDismiss(){
+  var b = document.getElementById('ios-banner');
+  if(b) b.style.display = 'none';
+}
+
+// iOS Safari detection
+(function(){
+  var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isSafari = /safari/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent);
+  var isStandalone = window.navigator.standalone === true;
+  if(isIos && isSafari && !isStandalone){
+    setTimeout(function(){
+      var b = document.getElementById('ios-banner');
+      if(b) b.style.display = 'block';
+    }, 2500);
+  }
+})();
+
+// Already installed — hide banners
+if(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone){
+  document.getElementById('pwa-banner').style.display = 'none';
+  document.getElementById('ios-banner').style.display = 'none';
+}
+</script>
+</body>
+</html>
